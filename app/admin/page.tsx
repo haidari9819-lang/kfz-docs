@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { LogIn, Download, RefreshCw, Eye, EyeOff } from "lucide-react";
+import Link from "next/link";
+import { LogIn, Download, RefreshCw, Eye, EyeOff, Settings } from "lucide-react";
 
 type Status = "ausstehend" | "in_bearbeitung" | "erledigt";
 
@@ -139,12 +140,21 @@ export default function AdminPage() {
               Admin
             </span>
           </div>
-          <button
-            onClick={() => setAuthed(false)}
-            className="text-sm text-gray-500 hover:text-gray-800 transition-colors"
-          >
-            Abmelden
-          </button>
+          <div className="flex items-center gap-4">
+            <Link
+              href="/admin/preise"
+              className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-800 transition-colors"
+            >
+              <Settings size={15} />
+              Preise
+            </Link>
+            <button
+              onClick={() => setAuthed(false)}
+              className="text-sm text-gray-500 hover:text-gray-800 transition-colors"
+            >
+              Abmelden
+            </button>
+          </div>
         </div>
       </header>
 
