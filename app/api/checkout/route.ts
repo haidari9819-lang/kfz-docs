@@ -34,7 +34,6 @@ export async function POST(req: NextRequest) {
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
 
   const session = await stripe.checkout.sessions.create({
-    payment_method_types: ["card", "sepa_debit"],
     line_items: [
       {
         price_data: {
