@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { extrahiereDokument } from "@/lib/grok";
 
 function getServiceClient() {
   return createClient(
@@ -8,6 +9,11 @@ function getServiceClient() {
   );
 }
 
+// Felder aus Personalausweis direkt in antraege übernehmen
+const ANTRAG_FELDER_MAP: Record<string, string[]> = {
+  personalausweis: ["vorname", "nachname", "adresse", "plz", "ort"],
+};
+
 export async function POST(req: NextRequest) {
   const formData = await req.formData();
   const file = formData.get("file") as File | null;
@@ -15,7 +21,10 @@ export async function POST(req: NextRequest) {
   const typ = formData.get("typ") as string | null;
 
   if (!file || !antrag_id || !typ) {
-    return NextResponse.json({ error: "file, antrag_id und typ erforderlich" }, { status: 400 });
+    return NextResponse.json(
+      { error: "file, antrag_id und typ erforderlich" },
+      { status: 400 }
+    );
   }
 
   const supabase = getServiceClient();
@@ -23,24 +32,59 @@ export async function POST(req: NextRequest) {
   const storagePfad = `${antrag_id}/${typ}/${safeName}`;
 
   const bytes = await file.arrayBuffer();
+
+  // 1. In Supabase Storage hochladen
   const { error: uploadError } = await supabase.storage
     .from("kfz-dokumente")
-    .upload(storagePfad, bytes, {
-      contentType: file.type,
-      upsert: false,
-    });
+    .upload(storagePfad, bytes, { contentType: file.type, upsert: false });
 
   if (uploadError) {
     return NextResponse.json({ error: uploadError.message }, { status: 500 });
   }
 
-  const { error: dbError } = await supabase
+  // 2. Eintrag in dokumente Tabelle
+  const { data: dokument, error: dbError } = await supabase
     .from("dokumente")
-    .insert({ antrag_id, typ, dateiname: file.name, storage_pfad: storagePfad });
+    .insert({ antrag_id, typ, dateiname: file.name, storage_pfad: storagePfad })
+    .select("id")
+    .single();
 
-  if (dbError) {
-    return NextResponse.json({ error: dbError.message }, { status: 500 });
+  if (dbError || !dokument) {
+    return NextResponse.json({ error: dbError?.message ?? "DB Fehler" }, { status: 500 });
   }
 
-  return NextResponse.json({ pfad: storagePfad });
+  // 3. Grok Vision — automatisch Felder extrahieren
+  let kiDaten = null;
+  if (process.env.XAI_API_KEY) {
+    try {
+      const base64 = Buffer.from(bytes).toString("base64");
+      const mimeType = file.type || "image/jpeg";
+
+      kiDaten = await extrahiereDokument(base64, mimeType, typ);
+
+      // KI-Daten im dokument speichern
+      await supabase
+        .from("dokumente")
+        .update({ ki_daten: kiDaten })
+        .eq("id", dokument.id);
+
+      // Relevante Felder direkt in antraege übernehmen
+      const felder = ANTRAG_FELDER_MAP[typ];
+      if (felder && kiDaten) {
+        const update: Record<string, string> = {};
+        for (const feld of felder) {
+          const wert = kiDaten[feld as keyof typeof kiDaten];
+          if (wert) update[feld] = wert as string;
+        }
+        if (Object.keys(update).length > 0) {
+          await supabase.from("antraege").update(update).eq("id", antrag_id);
+        }
+      }
+    } catch {
+      // Vision-Fehler nicht blockierend — Upload war erfolgreich
+      kiDaten = null;
+    }
+  }
+
+  return NextResponse.json({ pfad: storagePfad, dokument_id: dokument.id, ki_daten: kiDaten });
 }

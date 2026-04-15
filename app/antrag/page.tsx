@@ -1,25 +1,24 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { useRouter } from "next/navigation";
 import {
   CheckCircle, Upload, X, ChevronRight, ChevronLeft,
-  Car, FileText, UserCheck, Loader2, AlertCircle,
+  Car, FileText, UserCheck, Loader2, AlertCircle, Sparkles,
 } from "lucide-react";
 
 type Service = "anmeldung" | "abmeldung" | "halterwechsel";
 
 const SERVICES: { id: Service; label: string; price: string; icon: React.ReactNode }[] = [
-  { id: "anmeldung", label: "Anmeldung", price: "29€", icon: <Car size={28} /> },
-  { id: "abmeldung", label: "Abmeldung", price: "19€", icon: <FileText size={28} /> },
-  { id: "halterwechsel", label: "Halterwechsel", price: "39€", icon: <UserCheck size={28} /> },
+  { id: "anmeldung",    label: "Anmeldung",    price: "29€", icon: <Car size={28} /> },
+  { id: "abmeldung",   label: "Abmeldung",    price: "19€", icon: <FileText size={28} /> },
+  { id: "halterwechsel",label: "Halterwechsel",price: "39€", icon: <UserCheck size={28} /> },
 ];
 
 function getRequiredDocs(service: Service | null): { key: string; label: string }[] {
   const base = [
     { key: "personalausweis", label: "Personalausweis" },
-    { key: "fahrzeugschein", label: "Fahrzeugschein (ZB Teil I)" },
-    { key: "evb", label: "eVB-Nummer (Versicherungsnachweis)" },
+    { key: "fahrzeugschein",  label: "Fahrzeugschein (ZB Teil I)" },
+    { key: "evb",             label: "eVB-Nummer (Versicherungsnachweis)" },
   ];
   if (service === "anmeldung" || service === "halterwechsel") {
     base.push({ key: "fahrzeugbrief", label: "Fahrzeugbrief (ZB Teil II)" });
@@ -38,7 +37,6 @@ interface Contact {
 }
 
 export default function AntragPage() {
-  const router = useRouter();
   const [step, setStep] = useState(0);
   const [service, setService] = useState<Service | null>(null);
   const [files, setFiles] = useState<Record<string, File | null>>({});
@@ -47,8 +45,17 @@ export default function AntragPage() {
     telefon: "", adresse: "", plz: "", ort: "",
   });
   const [dragOver, setDragOver] = useState<string | null>(null);
+
+  // Upload & Scan State (Schritt 2 → 3)
+  const [antragId, setAntragId] = useState<string | null>(null);
+  const [scanning, setScanning] = useState(false);
+  const [scanProgress, setScanProgress] = useState("");
+  const [autoFilled, setAutoFilled] = useState<Set<string>>(new Set());
+  const [scanError, setScanError] = useState<string | null>(null);
+
+  // Checkout State (Schritt 4)
   const [loading, setLoading] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState<string>("");
+  const [uploadProgress, setUploadProgress] = useState("");
   const [error, setError] = useState<string | null>(null);
 
   const requiredDocs = getRequiredDocs(service);
@@ -77,40 +84,97 @@ export default function AntragPage() {
   const setContactField = (field: keyof Contact, value: string) =>
     setContact((p) => ({ ...p, [field]: value }));
 
-  const handleCheckout = async () => {
-    setLoading(true);
-    setError(null);
+  // Schritt 2 → 3: Antrag anlegen + Dateien hochladen + Grok Vision
+  const handleUploadAndScan = async () => {
+    setScanning(true);
+    setScanError(null);
+    setAutoFilled(new Set());
 
     try {
-      // 1. Antrag in DB anlegen
-      setUploadProgress("Antrag wird angelegt…");
+      // 1. Draft-Antrag anlegen (Kontaktdaten noch leer)
+      setScanProgress("Antrag wird vorbereitet…");
       const antragRes = await fetch("/api/antrag", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ service, ...contact }),
+        body: JSON.stringify({ service, vorname: "", nachname: "", email: "draft@pending.de", telefon: "", adresse: "", plz: "", ort: "" }),
       });
       if (!antragRes.ok) throw new Error("Antrag konnte nicht angelegt werden.");
       const { antrag_id } = await antragRes.json();
+      setAntragId(antrag_id);
 
-      // 2. Dateien hochladen
+      // 2. Dateien hochladen + Grok Vision pro Dokument
       const fileEntries = Object.entries(files).filter(([, f]) => f !== null);
+      const filledFields = new Set<string>();
+
       for (let i = 0; i < fileEntries.length; i++) {
         const [typ, file] = fileEntries[i];
-        setUploadProgress(`Dokument ${i + 1} von ${fileEntries.length} wird hochgeladen…`);
+        setScanProgress(`KI scannt ${i + 1} von ${fileEntries.length}: ${typ.replace("_", " ")}…`);
+
         const fd = new FormData();
         fd.append("file", file!);
         fd.append("antrag_id", antrag_id);
         fd.append("typ", typ);
         const uploadRes = await fetch("/api/upload", { method: "POST", body: fd });
+
         if (!uploadRes.ok) throw new Error(`Upload fehlgeschlagen: ${typ}`);
+
+        const { ki_daten } = await uploadRes.json();
+
+        // Auto-Fill: Personalausweis → Kontaktfelder
+        if (ki_daten && typ === "personalausweis") {
+          const mapping: Partial<Record<keyof Contact, string>> = {
+            vorname:  ki_daten.vorname,
+            nachname: ki_daten.nachname,
+            adresse:  ki_daten.adresse,
+            plz:      ki_daten.plz,
+            ort:      ki_daten.ort,
+          };
+          setContact((prev) => {
+            const updated = { ...prev };
+            for (const [field, value] of Object.entries(mapping)) {
+              if (value && !prev[field as keyof Contact]) {
+                updated[field as keyof Contact] = value;
+                filledFields.add(field);
+              }
+            }
+            return updated;
+          });
+          setAutoFilled(new Set(filledFields));
+        }
       }
 
-      // 3. Stripe Checkout Session erstellen
+      setScanProgress("");
+      setScanning(false);
+      setStep(2);
+    } catch (err) {
+      setScanError(err instanceof Error ? err.message : "Fehler beim Scannen.");
+      setScanning(false);
+      setScanProgress("");
+    }
+  };
+
+  // Schritt 4: Nur noch Stripe Checkout (Upload bereits erledigt)
+  const handleCheckout = async () => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      // Kontaktdaten im bestehenden Antrag updaten
+      setUploadProgress("Daten werden gespeichert…");
+      if (antragId) {
+        await fetch("/api/antrag", {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ antrag_id: antragId, ...contact }),
+        });
+      }
+
+      // Stripe Checkout
       setUploadProgress("Weiterleitung zur Zahlung…");
       const checkoutRes = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ service, antrag_id }),
+        body: JSON.stringify({ service, antrag_id: antragId }),
       });
       if (!checkoutRes.ok) throw new Error("Zahlung konnte nicht initiiert werden.");
       const { url, error: checkoutError } = await checkoutRes.json();
@@ -118,7 +182,7 @@ export default function AntragPage() {
       window.location.href = url;
 
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Unbekannter Fehler. Bitte versuchen Sie es erneut.");
+      setError(err instanceof Error ? err.message : "Unbekannter Fehler.");
       setLoading(false);
       setUploadProgress("");
     }
@@ -164,7 +228,7 @@ export default function AntragPage() {
 
       <div className="max-w-2xl mx-auto px-4 py-10">
 
-        {/* Schritt 1 */}
+        {/* Schritt 1 — Service wählen */}
         {step === 0 && (
           <div>
             <h1 className="text-2xl font-bold text-[#111111] mb-2">Welchen Service benötigen Sie?</h1>
@@ -196,11 +260,22 @@ export default function AntragPage() {
           </div>
         )}
 
-        {/* Schritt 2 */}
+        {/* Schritt 2 — Dokumente hochladen */}
         {step === 1 && (
           <div>
             <h1 className="text-2xl font-bold text-[#111111] mb-2">Dokumente hochladen</h1>
-            <p className="text-gray-500 mb-8">Erlaubte Formate: PDF, JPG, PNG. Max. 10 MB pro Datei.</p>
+            <div className="flex items-center gap-2 bg-blue-50 text-[#2563eb] text-xs font-medium px-3 py-2 rounded-lg mb-6 w-fit">
+              <Sparkles size={14} />
+              KI erkennt Ihre Daten automatisch nach dem Upload
+            </div>
+
+            {scanError && (
+              <div className="flex items-center gap-3 bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-3 mb-5 text-sm">
+                <AlertCircle size={16} className="shrink-0" />
+                {scanError}
+              </div>
+            )}
+
             <div className="space-y-4">
               {requiredDocs.map((doc) => {
                 const uploaded = files[doc.key];
@@ -259,73 +334,82 @@ export default function AntragPage() {
           </div>
         )}
 
-        {/* Schritt 3 */}
+        {/* Schritt 3 — Kontaktdaten (mit Auto-Fill Badges) */}
         {step === 2 && (
           <div>
             <h1 className="text-2xl font-bold text-[#111111] mb-2">Ihre Kontaktdaten</h1>
-            <p className="text-gray-500 mb-8">Für die Bearbeitung und Rückmeldung benötigen wir Ihre Daten.</p>
+            {autoFilled.size > 0 && (
+              <div className="flex items-center gap-2 bg-green-50 text-green-700 text-xs font-medium px-3 py-2 rounded-lg mb-6 w-fit">
+                <Sparkles size={14} />
+                KI hat {autoFilled.size} Felder aus dem Personalausweis ausgefüllt — bitte prüfen
+              </div>
+            )}
+            <p className="text-gray-500 mb-8">Bitte prüfen und fehlende Felder ergänzen.</p>
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 {(["vorname", "nachname"] as const).map((f) => (
                   <div key={f}>
-                    <label className="block text-sm font-medium text-[#111111] mb-1 capitalize">
+                    <label className="block text-sm font-medium text-[#111111] mb-1 flex items-center gap-1">
                       {f === "vorname" ? "Vorname" : "Nachname"} <span className="text-red-500">*</span>
+                      {autoFilled.has(f) && <Sparkles size={12} className="text-green-500 ml-1" />}
                     </label>
                     <input
                       type="text"
                       value={contact[f]}
                       onChange={(e) => setContactField(f, e.target.value)}
                       placeholder={f === "vorname" ? "Max" : "Mustermann"}
-                      className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#2563eb] focus:border-transparent"
+                      className={`w-full border rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#2563eb] focus:border-transparent ${
+                        autoFilled.has(f) ? "border-green-300 bg-green-50" : "border-gray-200"
+                      }`}
                     />
                   </div>
                 ))}
               </div>
               {([
-                { key: "email", label: "E-Mail-Adresse", placeholder: "max@beispiel.de", type: "email" },
-                { key: "telefon", label: "Telefonnummer", placeholder: "+49 1234 567890", type: "tel" },
-                { key: "adresse", label: "Straße und Hausnummer", placeholder: "Musterstraße 1", type: "text" },
+                { key: "email",   label: "E-Mail-Adresse",       placeholder: "max@beispiel.de",   type: "email" },
+                { key: "telefon", label: "Telefonnummer",         placeholder: "+49 1234 567890",   type: "tel" },
+                { key: "adresse", label: "Straße und Hausnummer", placeholder: "Musterstraße 1",    type: "text" },
               ] as const).map((f) => (
                 <div key={f.key}>
-                  <label className="block text-sm font-medium text-[#111111] mb-1">
+                  <label className="block text-sm font-medium text-[#111111] mb-1 flex items-center gap-1">
                     {f.label} <span className="text-red-500">*</span>
+                    {autoFilled.has(f.key) && <Sparkles size={12} className="text-green-500 ml-1" />}
                   </label>
                   <input
                     type={f.type}
                     value={contact[f.key]}
                     onChange={(e) => setContactField(f.key, e.target.value)}
                     placeholder={f.placeholder}
-                    className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#2563eb] focus:border-transparent"
+                    className={`w-full border rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#2563eb] focus:border-transparent ${
+                      autoFilled.has(f.key) ? "border-green-300 bg-green-50" : "border-gray-200"
+                    }`}
                   />
                 </div>
               ))}
               <div className="grid grid-cols-3 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-[#111111] mb-1">PLZ <span className="text-red-500">*</span></label>
-                  <input
-                    type="text"
-                    value={contact.plz}
-                    onChange={(e) => setContactField("plz", e.target.value)}
-                    placeholder="12345"
-                    className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#2563eb] focus:border-transparent"
-                  />
-                </div>
-                <div className="col-span-2">
-                  <label className="block text-sm font-medium text-[#111111] mb-1">Ort <span className="text-red-500">*</span></label>
-                  <input
-                    type="text"
-                    value={contact.ort}
-                    onChange={(e) => setContactField("ort", e.target.value)}
-                    placeholder="Musterstadt"
-                    className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#2563eb] focus:border-transparent"
-                  />
-                </div>
+                {(["plz", "ort"] as const).map((f) => (
+                  <div key={f} className={f === "ort" ? "col-span-2" : ""}>
+                    <label className="block text-sm font-medium text-[#111111] mb-1 flex items-center gap-1">
+                      {f === "plz" ? "PLZ" : "Ort"} <span className="text-red-500">*</span>
+                      {autoFilled.has(f) && <Sparkles size={12} className="text-green-500 ml-1" />}
+                    </label>
+                    <input
+                      type="text"
+                      value={contact[f]}
+                      onChange={(e) => setContactField(f, e.target.value)}
+                      placeholder={f === "plz" ? "12345" : "Musterstadt"}
+                      className={`w-full border rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#2563eb] focus:border-transparent ${
+                        autoFilled.has(f) ? "border-green-300 bg-green-50" : "border-gray-200"
+                      }`}
+                    />
+                  </div>
+                ))}
               </div>
             </div>
           </div>
         )}
 
-        {/* Schritt 4 */}
+        {/* Schritt 4 — Zusammenfassung */}
         {step === 3 && (
           <div>
             <h1 className="text-2xl font-bold text-[#111111] mb-2">Zusammenfassung & Bezahlung</h1>
@@ -347,7 +431,7 @@ export default function AntragPage() {
                     <div key={doc.key} className="flex items-center gap-2 text-sm">
                       <CheckCircle size={14} className="text-green-500" />
                       <span className="text-gray-600">{doc.label}</span>
-                      <span className="text-gray-400 text-xs ml-auto">{files[doc.key]?.name}</span>
+                      <span className="text-gray-400 text-xs ml-auto truncate max-w-32">{files[doc.key]?.name}</span>
                     </div>
                   ))}
                 </div>
@@ -367,7 +451,6 @@ export default function AntragPage() {
                 {error}
               </div>
             )}
-
             {loading && (
               <div className="flex items-center gap-3 bg-blue-50 text-[#2563eb] rounded-xl px-4 py-3 mb-5 text-sm">
                 <Loader2 size={16} className="animate-spin shrink-0" />
@@ -379,7 +462,6 @@ export default function AntragPage() {
               Mit dem Klick auf "Jetzt bezahlen" stimmen Sie unseren AGB zu.
               Behördengebühren werden separat berechnet.
             </p>
-
             <button
               onClick={handleCheckout}
               disabled={loading}
@@ -387,8 +469,7 @@ export default function AntragPage() {
             >
               {loading
                 ? <><Loader2 size={20} className="animate-spin" /> Bitte warten…</>
-                : `Jetzt bezahlen — ${selectedService?.price}`
-              }
+                : `Jetzt bezahlen — ${selectedService?.price}`}
             </button>
           </div>
         )}
@@ -397,12 +478,29 @@ export default function AntragPage() {
         <div className="flex justify-between mt-10">
           <button
             onClick={() => setStep((s) => Math.max(0, s - 1))}
-            disabled={step === 0 || loading}
+            disabled={step === 0 || loading || scanning}
             className="flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-gray-800 disabled:opacity-30 transition-colors"
           >
             <ChevronLeft size={18} /> Zurück
           </button>
-          {step < 3 && (
+
+          {/* Schritt 2 → 3: Upload + Scan auslösen */}
+          {step === 1 && (
+            <button
+              onClick={handleUploadAndScan}
+              disabled={!canProceed() || scanning}
+              className="flex items-center gap-2 bg-[#2563eb] text-white px-6 py-2.5 rounded-xl text-sm font-semibold hover:bg-blue-700 disabled:opacity-40 transition-colors"
+            >
+              {scanning ? (
+                <><Loader2 size={16} className="animate-spin" /> {scanProgress || "KI scannt…"}</>
+              ) : (
+                <><Sparkles size={16} /> KI scannen & weiter</>
+              )}
+            </button>
+          )}
+
+          {/* Alle anderen Schritte */}
+          {step < 3 && step !== 1 && (
             <button
               onClick={() => setStep((s) => s + 1)}
               disabled={!canProceed()}
