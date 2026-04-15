@@ -8,14 +8,12 @@ function getServiceClient() {
   );
 }
 
-// Schritt 3: Kontaktdaten speichern
-// Frontend sendet "adresse", DB-Spalte heißt "strasse" → Mapping hier
 export async function PATCH(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
-  const { vorname, nachname, email, telefon, adresse, plz, ort } = await req.json();
+  const { vorname, nachname, email, telefon, adresse, plz, ort, sicherheitscode, evb_nummer } = await req.json();
 
   if (!id) {
     return NextResponse.json({ error: "id erforderlich" }, { status: 400 });
@@ -25,13 +23,15 @@ export async function PATCH(
   const { error } = await supabase
     .from("antraege")
     .update({
-      vorname:  vorname  ?? "",
-      nachname: nachname ?? "",
-      email:    email    ?? "",
-      telefon:  telefon  ?? "",
-      strasse:  adresse  ?? "",   // Frontend → DB Mapping
-      plz:      plz      ?? "",
-      ort:      ort      ?? "",
+      vorname:         vorname         ?? "",
+      nachname:        nachname        ?? "",
+      email:           email           ?? "",
+      telefon:         telefon         ?? "",
+      strasse:         adresse         ?? "",   // Frontend → DB Mapping
+      plz:             plz             ?? "",
+      ort:             ort             ?? "",
+      sicherheitscode: sicherheitscode ?? null,
+      evb_nummer:      evb_nummer      ?? null,
     })
     .eq("id", id);
 

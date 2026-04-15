@@ -14,17 +14,22 @@ const SERVICES: { id: Service; label: string; price: string; icon: React.ReactNo
   { id: "halterwechsel",label: "Halterwechsel",price: "39€", icon: <UserCheck size={28} /> },
 ];
 
-function getRequiredDocs(service: Service | null): { key: string; label: string }[] {
-  const base = [
+interface DocDef { key: string; label: string; optional?: boolean }
+
+function getRequiredDocs(service: Service | null): DocDef[] {
+  const base: DocDef[] = [
     { key: "personalausweis", label: "Personalausweis" },
     { key: "fahrzeugschein",  label: "Fahrzeugschein (ZB Teil I)" },
-    { key: "evb",             label: "eVB-Nummer (Versicherungsnachweis)" },
   ];
-  if (service === "anmeldung" || service === "halterwechsel") {
-    base.push({ key: "fahrzeugbrief", label: "Fahrzeugbrief (ZB Teil II)" });
-  }
   if (service === "anmeldung") {
-    base.push({ key: "sepa", label: "SEPA-Lastschriftmandat" });
+    // eVB als optionales Dokument — Textfeld im nächsten Schritt als Alternative
+    base.push({ key: "evb",          label: "eVB-Nummer (Versicherungsnachweis)", optional: true });
+    base.push({ key: "fahrzeugbrief", label: "Fahrzeugbrief (ZB Teil II)" });
+    base.push({ key: "sepa",          label: "SEPA-Lastschriftmandat" });
+  }
+  if (service === "halterwechsel") {
+    base.push({ key: "evb",          label: "eVB-Nummer (Versicherungsnachweis)" });
+    base.push({ key: "fahrzeugbrief", label: "Fahrzeugbrief (ZB Teil II)" });
   }
   return base;
 }
@@ -34,6 +39,7 @@ const STEPS = ["Service wählen", "Dokumente", "Kontaktdaten", "Zusammenfassung"
 interface Contact {
   vorname: string; nachname: string; email: string;
   telefon: string; adresse: string; plz: string; ort: string;
+  sicherheitscode: string; evb_nummer: string;
 }
 
 export default function AntragPage() {
@@ -43,6 +49,7 @@ export default function AntragPage() {
   const [contact, setContact] = useState<Contact>({
     vorname: "", nachname: "", email: "",
     telefon: "", adresse: "", plz: "", ort: "",
+    sicherheitscode: "", evb_nummer: "",
   });
   const [dragOver, setDragOver] = useState<string | null>(null);
 
@@ -62,10 +69,14 @@ export default function AntragPage() {
 
   const canProceed = (): boolean => {
     if (step === 0) return service !== null;
-    if (step === 1) return requiredDocs.every((d) => files[d.key]);
+    if (step === 1) return requiredDocs.filter((d) => !d.optional).every((d) => files[d.key]);
     if (step === 2) {
-      return !!(contact.vorname && contact.nachname && contact.email &&
+      const base = !!(contact.vorname && contact.nachname && contact.email &&
         contact.telefon && contact.adresse && contact.plz && contact.ort);
+      if (service === "abmeldung" && !contact.sicherheitscode) return false;
+      // Anmeldung: evb_nummer Pflicht falls kein evb-Dokument hochgeladen
+      if (service === "anmeldung" && !files["evb"] && !contact.evb_nummer) return false;
+      return base;
     }
     return true;
   };
@@ -91,7 +102,6 @@ export default function AntragPage() {
     setAutoFilled(new Set());
 
     try {
-      // 1. Draft-Antrag anlegen (Kontaktdaten noch leer)
       setScanProgress("Antrag wird vorbereitet…");
       const antragRes = await fetch("/api/antrag", {
         method: "POST",
@@ -103,7 +113,6 @@ export default function AntragPage() {
       const { antrag_id } = antragJson;
       setAntragId(antrag_id);
 
-      // 2. Dateien hochladen + Grok Vision pro Dokument
       const fileEntries = Object.entries(files).filter(([, f]) => f !== null);
       const filledFields = new Set<string>();
 
@@ -124,7 +133,6 @@ export default function AntragPage() {
 
         const { ki_daten } = await uploadRes.json();
 
-        // Auto-Fill: Personalausweis → Kontaktfelder
         if (ki_daten && typ === "personalausweis") {
           const mapping: Partial<Record<keyof Contact, string>> = {
             vorname:  ki_daten.vorname,
@@ -157,13 +165,12 @@ export default function AntragPage() {
     }
   };
 
-  // Schritt 4: Nur noch Stripe Checkout (Upload bereits erledigt)
+  // Schritt 4: Kontaktdaten + Extra-Felder speichern → Stripe
   const handleCheckout = async () => {
     setLoading(true);
     setError(null);
 
     try {
-      // Kontaktdaten im bestehenden Antrag updaten
       setUploadProgress("Daten werden gespeichert…");
       if (antragId) {
         const patchRes = await fetch(`/api/antrag/${antragId}`, {
@@ -177,7 +184,6 @@ export default function AntragPage() {
         }
       }
 
-      // Stripe Checkout
       setUploadProgress("Weiterleitung zur Zahlung…");
       const checkoutRes = await fetch("/api/checkout", {
         method: "POST",
@@ -205,7 +211,7 @@ export default function AntragPage() {
           <a href="/" className="font-bold text-lg tracking-tight">
             KFZ<span className="text-[#2563eb]">-Docs</span>
           </a>
-          <span className="text-sm text-gray-400">Sicher & verschlüsselt</span>
+          <span className="text-sm text-gray-400">Sicher &amp; verschlüsselt</span>
         </div>
       </header>
 
@@ -291,7 +297,11 @@ export default function AntragPage() {
                 return (
                   <div key={doc.key}>
                     <label className="block text-sm font-medium text-[#111111] mb-2">
-                      {doc.label} <span className="text-red-500">*</span>
+                      {doc.label}{" "}
+                      {doc.optional
+                        ? <span className="text-gray-400 font-normal">(optional — oder Nummer im nächsten Schritt)</span>
+                        : <span className="text-red-500">*</span>
+                      }
                     </label>
                     <div
                       onDragOver={(e) => { e.preventDefault(); setDragOver(doc.key); }}
@@ -342,7 +352,7 @@ export default function AntragPage() {
           </div>
         )}
 
-        {/* Schritt 3 — Kontaktdaten (mit Auto-Fill Badges) */}
+        {/* Schritt 3 — Kontaktdaten */}
         {step === 2 && (
           <div>
             <h1 className="text-2xl font-bold text-[#111111] mb-2">Ihre Kontaktdaten</h1>
@@ -413,6 +423,44 @@ export default function AntragPage() {
                   </div>
                 ))}
               </div>
+
+              {/* Sicherheitscode — nur bei Abmeldung */}
+              {service === "abmeldung" && (
+                <div>
+                  <label className="block text-sm font-medium text-[#111111] mb-1">
+                    Sicherheitscode (auf dem Fahrzeugschein, Feld 2) <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={contact.sicherheitscode}
+                    onChange={(e) => setContactField("sicherheitscode", e.target.value.toUpperCase())}
+                    placeholder="z.B. ABC123"
+                    className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#2563eb] focus:border-transparent font-mono tracking-widest"
+                  />
+                  <p className="text-xs text-gray-400 mt-1">
+                    Der Sicherheitscode befindet sich auf dem Fahrzeugschein (Zulassungsbescheinigung Teil I) in Feld 2.
+                  </p>
+                </div>
+              )}
+
+              {/* eVB-Nummer — nur bei Anmeldung, falls kein Dokument hochgeladen */}
+              {service === "anmeldung" && !files["evb"] && (
+                <div>
+                  <label className="block text-sm font-medium text-[#111111] mb-1">
+                    eVB-Nummer (Versicherungsnachweis) <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={contact.evb_nummer}
+                    onChange={(e) => setContactField("evb_nummer", e.target.value.toUpperCase())}
+                    placeholder="z.B. A1B2C3D"
+                    className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#2563eb] focus:border-transparent font-mono tracking-widest"
+                  />
+                  <p className="text-xs text-gray-400 mt-1">
+                    7-stelliger Code von Ihrer Kfz-Versicherung. Alternativ: eVB-Dokument in Schritt 2 hochladen.
+                  </p>
+                </div>
+              )}
             </div>
           </div>
         )}
@@ -420,7 +468,7 @@ export default function AntragPage() {
         {/* Schritt 4 — Zusammenfassung */}
         {step === 3 && (
           <div>
-            <h1 className="text-2xl font-bold text-[#111111] mb-2">Zusammenfassung & Bezahlung</h1>
+            <h1 className="text-2xl font-bold text-[#111111] mb-2">Zusammenfassung &amp; Bezahlung</h1>
             <p className="text-gray-500 mb-8">Prüfen Sie Ihre Angaben und schließen Sie den Auftrag ab.</p>
 
             <div className="bg-white rounded-2xl border border-gray-200 p-6 space-y-5 mb-6">
@@ -435,13 +483,20 @@ export default function AntragPage() {
               <div>
                 <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Dokumente</h3>
                 <div className="space-y-1">
-                  {requiredDocs.map((doc) => (
+                  {requiredDocs.filter((d) => files[d.key]).map((doc) => (
                     <div key={doc.key} className="flex items-center gap-2 text-sm">
                       <CheckCircle size={14} className="text-green-500" />
                       <span className="text-gray-600">{doc.label}</span>
                       <span className="text-gray-400 text-xs ml-auto truncate max-w-32">{files[doc.key]?.name}</span>
                     </div>
                   ))}
+                  {service === "anmeldung" && contact.evb_nummer && !files["evb"] && (
+                    <div className="flex items-center gap-2 text-sm">
+                      <CheckCircle size={14} className="text-green-500" />
+                      <span className="text-gray-600">eVB-Nummer</span>
+                      <span className="text-gray-400 text-xs ml-auto font-mono">{contact.evb_nummer}</span>
+                    </div>
+                  )}
                 </div>
               </div>
               <hr className="border-gray-100" />
@@ -450,6 +505,11 @@ export default function AntragPage() {
                 <p className="text-sm text-gray-700">{contact.vorname} {contact.nachname}</p>
                 <p className="text-sm text-gray-500">{contact.email} · {contact.telefon}</p>
                 <p className="text-sm text-gray-500">{contact.adresse}, {contact.plz} {contact.ort}</p>
+                {service === "abmeldung" && contact.sicherheitscode && (
+                  <p className="text-sm text-gray-500 mt-1">
+                    Sicherheitscode: <span className="font-mono font-semibold">{contact.sicherheitscode}</span>
+                  </p>
+                )}
               </div>
             </div>
 
@@ -467,7 +527,7 @@ export default function AntragPage() {
             )}
 
             <p className="text-xs text-gray-400 mb-5 text-center">
-              Mit dem Klick auf "Jetzt bezahlen" stimmen Sie unseren AGB zu.
+              Mit dem Klick auf &quot;Jetzt bezahlen&quot; stimmen Sie unseren AGB zu.
               Behördengebühren werden separat berechnet.
             </p>
             <button
@@ -492,7 +552,6 @@ export default function AntragPage() {
             <ChevronLeft size={18} /> Zurück
           </button>
 
-          {/* Schritt 2 → 3: Upload + Scan auslösen */}
           {step === 1 && (
             <button
               onClick={handleUploadAndScan}
@@ -502,12 +561,11 @@ export default function AntragPage() {
               {scanning ? (
                 <><Loader2 size={16} className="animate-spin" /> {scanProgress || "KI scannt…"}</>
               ) : (
-                <><Sparkles size={16} /> KI scannen & weiter</>
+                <><Sparkles size={16} /> KI scannen &amp; weiter</>
               )}
             </button>
           )}
 
-          {/* Alle anderen Schritte */}
           {step < 3 && step !== 1 && (
             <button
               onClick={() => setStep((s) => s + 1)}
