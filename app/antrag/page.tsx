@@ -113,7 +113,8 @@ export default function AntragPage() {
         body: JSON.stringify({ service, antrag_id }),
       });
       if (!checkoutRes.ok) throw new Error("Zahlung konnte nicht initiiert werden.");
-      const { url } = await checkoutRes.json();
+      const { url, error: checkoutError } = await checkoutRes.json();
+      if (!url) throw new Error(checkoutError ?? "Stripe URL fehlt.");
       window.location.href = url;
 
     } catch (err) {

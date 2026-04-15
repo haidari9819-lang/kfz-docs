@@ -12,6 +12,10 @@ export async function PATCH(
   req: NextRequest,
   { params }: { params: Promise<{ service: string }> }
 ) {
+  if (req.headers.get("x-admin-password") !== process.env.ADMIN_PASSWORD) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   const { service } = await params;
   const allowed = ["anmeldung", "abmeldung", "halterwechsel"];
   if (!allowed.includes(service)) {

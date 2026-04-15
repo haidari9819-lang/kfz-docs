@@ -57,5 +57,9 @@ export async function POST(req: NextRequest) {
     locale: "de",
   });
 
+  if (!session.url) {
+    return NextResponse.json({ error: "Stripe Session URL fehlt" }, { status: 500 });
+  }
+
   return NextResponse.json({ url: session.url });
 }
