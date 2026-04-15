@@ -96,7 +96,7 @@ export default function AntragPage() {
       const antragRes = await fetch("/api/antrag", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ service, vorname: "", nachname: "", email: "draft@pending.de", telefon: "", adresse: "", plz: "", ort: "" }),
+        body: JSON.stringify({ service }),
       });
       const antragJson = await antragRes.json();
       if (!antragRes.ok) throw new Error(antragJson.error ?? "Antrag konnte nicht angelegt werden.");
@@ -163,11 +163,15 @@ export default function AntragPage() {
       // Kontaktdaten im bestehenden Antrag updaten
       setUploadProgress("Daten werden gespeichert…");
       if (antragId) {
-        await fetch("/api/antrag", {
+        const patchRes = await fetch(`/api/antrag/${antragId}`, {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ antrag_id: antragId, ...contact }),
+          body: JSON.stringify(contact),
         });
+        if (!patchRes.ok) {
+          const { error } = await patchRes.json();
+          throw new Error(error ?? "Kontaktdaten konnten nicht gespeichert werden.");
+        }
       }
 
       // Stripe Checkout

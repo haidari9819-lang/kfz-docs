@@ -10,8 +10,15 @@ function getServiceClient() {
 }
 
 // Felder aus Personalausweis direkt in antraege übernehmen
-const ANTRAG_FELDER_MAP: Record<string, string[]> = {
-  personalausweis: ["vorname", "nachname", "adresse", "plz", "ort"],
+// Format: [ki_daten Feld, DB Spalte] — DB heißt "strasse", Frontend "adresse"
+const ANTRAG_FELDER_MAP: Record<string, [string, string][]> = {
+  personalausweis: [
+    ["vorname",  "vorname"],
+    ["nachname", "nachname"],
+    ["adresse",  "strasse"],   // ki_daten.adresse → DB strasse
+    ["plz",      "plz"],
+    ["ort",      "ort"],
+  ],
 };
 
 export async function POST(req: NextRequest) {
@@ -72,9 +79,9 @@ export async function POST(req: NextRequest) {
       const felder = ANTRAG_FELDER_MAP[typ];
       if (felder && kiDaten) {
         const update: Record<string, string> = {};
-        for (const feld of felder) {
-          const wert = kiDaten[feld as keyof typeof kiDaten];
-          if (wert) update[feld] = wert as string;
+        for (const [kiField, dbField] of felder) {
+          const wert = kiDaten[kiField as keyof typeof kiDaten];
+          if (wert) update[dbField] = wert as string;
         }
         if (Object.keys(update).length > 0) {
           await supabase.from("antraege").update(update).eq("id", antrag_id);
