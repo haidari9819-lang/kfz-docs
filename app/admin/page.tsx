@@ -13,7 +13,7 @@ interface Dokument {
   id: string;
   typ: string;
   dateiname: string;
-  storage_pfad: string;
+  storage_path: string;
 }
 
 interface Antrag {
@@ -284,7 +284,7 @@ export default function AdminPage() {
                             {antrag.dokumente?.map((dok) => (
                               <button
                                 key={dok.id}
-                                onClick={() => downloadDokument(dok.storage_pfad, dok.dateiname)}
+                                onClick={() => downloadDokument(dok.storage_path, dok.dateiname)}
                                 title={dok.dateiname}
                                 className="inline-flex items-center gap-1 bg-gray-100 hover:bg-gray-200 text-gray-600 px-2 py-1 rounded-lg text-xs transition-colors"
                               >

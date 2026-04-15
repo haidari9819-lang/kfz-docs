@@ -21,7 +21,7 @@ export async function GET(req: NextRequest) {
   const supabase = getServiceClient();
   const { data, error } = await supabase
     .from("antraege")
-    .select(`*, dokumente(id, typ, dateiname, storage_pfad)`)
+    .select(`*, dokumente(id, typ, dateiname, storage_path)`)
     .order("created_at", { ascending: false });
 
   if (error) {

@@ -56,7 +56,7 @@ export async function POST(req: NextRequest) {
   // 2. Eintrag in dokumente Tabelle
   const { data: dokument, error: dbError } = await supabase
     .from("dokumente")
-    .insert({ antrag_id, typ, dateiname: file.name, storage_pfad: storagePfad })
+    .insert({ antrag_id, typ, dateiname: file.name, storage_path: storagePfad })
     .select("id")
     .single();
 
