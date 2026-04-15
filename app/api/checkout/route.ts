@@ -27,11 +27,20 @@ export async function POST(req: NextRequest) {
     .eq("aktiv", true)
     .single();
 
+  const fallback: Record<string, { betrag: number; name: string }> = {
+    anmeldung:    { betrag: 2900, name: "KFZ Anmeldung" },
+    abmeldung:    { betrag: 1900, name: "KFZ Abmeldung" },
+    halterwechsel:{ betrag: 3900, name: "Halterwechsel" },
+  };
+
   if (preisError || !preis) {
-    console.error("PREIS FEHLER:", preisError?.message, "| service:", service);
-    return NextResponse.json({ error: `Preis nicht gefunden für: ${service}` }, { status: 404 });
+    if (!fallback[service]) {
+      console.error("PREIS FEHLER:", preisError?.message, "| service:", service);
+      return NextResponse.json({ error: `Preis nicht gefunden für: ${service}` }, { status: 404 });
+    }
   }
 
+  const effektiverPreis = preis ?? fallback[service];
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
 
   try {
@@ -40,10 +49,10 @@ export async function POST(req: NextRequest) {
         {
           price_data: {
             currency: "eur",
-            unit_amount: preis.betrag,
+            unit_amount: effektiverPreis.betrag,
             product_data: {
-              name: preis.name,
-              description: preis.beschreibung ?? undefined,
+              name: effektiverPreis.name,
+              description: (preis as { beschreibung?: string } | null)?.beschreibung ?? undefined,
             },
           },
           quantity: 1,
