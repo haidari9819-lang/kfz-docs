@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import {
   CheckCircle, Upload, X, ChevronRight, ChevronLeft,
-  Car, FileText, UserCheck, Loader2, AlertCircle, Sparkles,
+  Car, FileText, UserCheck, Loader2, AlertCircle, Sparkles, Info,
 } from "lucide-react";
 
 type Service = "anmeldung" | "abmeldung" | "halterwechsel";
@@ -22,16 +22,48 @@ function getRequiredDocs(service: Service | null): DocDef[] {
     { key: "fahrzeugschein",  label: "Fahrzeugschein (ZB Teil I)" },
   ];
   if (service === "anmeldung") {
-    // eVB als optionales Dokument — Textfeld im nächsten Schritt als Alternative
-    base.push({ key: "evb",          label: "eVB-Nummer (Versicherungsnachweis)", optional: true });
+    base.push({ key: "evb",           label: "eVB-Nummer (Versicherungsnachweis)", optional: true });
     base.push({ key: "fahrzeugbrief", label: "Fahrzeugbrief (ZB Teil II)" });
     base.push({ key: "sepa",          label: "SEPA-Lastschriftmandat" });
   }
   if (service === "halterwechsel") {
-    base.push({ key: "evb",          label: "eVB-Nummer (Versicherungsnachweis)" });
+    base.push({ key: "evb",           label: "eVB-Nummer (Versicherungsnachweis)" });
     base.push({ key: "fahrzeugbrief", label: "Fahrzeugbrief (ZB Teil II)" });
   }
   return base;
+}
+
+// Info-Tooltip Komponente
+function InfoButton({ text }: { text: string }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [open]);
+
+  return (
+    <div className="relative inline-flex" ref={ref}>
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        className="text-gray-400 hover:text-[#2563eb] transition-colors ml-1 align-middle"
+        aria-label="Info"
+      >
+        <Info size={14} />
+      </button>
+      {open && (
+        <div className="absolute z-50 left-6 top-0 w-72 bg-white border border-gray-200 rounded-xl shadow-lg p-3 text-xs text-gray-600 leading-relaxed">
+          {text}
+        </div>
+      )}
+    </div>
+  );
 }
 
 const STEPS = ["Service wählen", "Dokumente", "Kontaktdaten", "Zusammenfassung"];
@@ -39,7 +71,10 @@ const STEPS = ["Service wählen", "Dokumente", "Kontaktdaten", "Zusammenfassung"
 interface Contact {
   vorname: string; nachname: string; email: string;
   telefon: string; adresse: string; plz: string; ort: string;
-  sicherheitscode: string; evb_nummer: string;
+  evb_nummer: string;
+  kennzeichen: string;
+  sicherheitscode_vorne: string;
+  sicherheitscode_hinten: string;
 }
 
 export default function AntragPage() {
@@ -49,18 +84,21 @@ export default function AntragPage() {
   const [contact, setContact] = useState<Contact>({
     vorname: "", nachname: "", email: "",
     telefon: "", adresse: "", plz: "", ort: "",
-    sicherheitscode: "", evb_nummer: "",
+    evb_nummer: "",
+    kennzeichen: "",
+    sicherheitscode_vorne: "",
+    sicherheitscode_hinten: "",
   });
   const [dragOver, setDragOver] = useState<string | null>(null);
 
-  // Upload & Scan State (Schritt 2 → 3)
+  // Upload & Scan State
   const [antragId, setAntragId] = useState<string | null>(null);
   const [scanning, setScanning] = useState(false);
   const [scanProgress, setScanProgress] = useState("");
   const [autoFilled, setAutoFilled] = useState<Set<string>>(new Set());
   const [scanError, setScanError] = useState<string | null>(null);
 
-  // Checkout State (Schritt 4)
+  // Checkout State
   const [loading, setLoading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -69,12 +107,17 @@ export default function AntragPage() {
 
   const canProceed = (): boolean => {
     if (step === 0) return service !== null;
-    if (step === 1) return requiredDocs.filter((d) => !d.optional).every((d) => files[d.key]);
+    if (step === 1) {
+      const docsOk = requiredDocs.filter((d) => !d.optional).every((d) => files[d.key]);
+      if (!docsOk) return false;
+      if (service === "abmeldung") {
+        return !!(contact.kennzeichen && contact.sicherheitscode_vorne && contact.sicherheitscode_hinten);
+      }
+      return true;
+    }
     if (step === 2) {
       const base = !!(contact.vorname && contact.nachname && contact.email &&
         contact.telefon && contact.adresse && contact.plz && contact.ort);
-      if (service === "abmeldung" && !contact.sicherheitscode) return false;
-      // Anmeldung: evb_nummer Pflicht falls kein evb-Dokument hochgeladen
       if (service === "anmeldung" && !files["evb"] && !contact.evb_nummer) return false;
       return base;
     }
@@ -95,7 +138,6 @@ export default function AntragPage() {
   const setContactField = (field: keyof Contact, value: string) =>
     setContact((p) => ({ ...p, [field]: value }));
 
-  // Schritt 2 → 3: Antrag anlegen + Dateien hochladen + Grok Vision
   const handleUploadAndScan = async () => {
     setScanning(true);
     setScanError(null);
@@ -165,7 +207,6 @@ export default function AntragPage() {
     }
   };
 
-  // Schritt 4: Kontaktdaten + Extra-Felder speichern → Stripe
   const handleCheckout = async () => {
     setLoading(true);
     setError(null);
@@ -348,6 +389,66 @@ export default function AntragPage() {
                   </div>
                 );
               })}
+
+              {/* Zusatzfelder nur bei Abmeldung */}
+              {service === "abmeldung" && (
+                <div className="mt-6 pt-6 border-t border-gray-100 space-y-4">
+                  <h2 className="text-sm font-bold text-[#111111] uppercase tracking-wider text-gray-500">
+                    Fahrzeugdaten
+                  </h2>
+
+                  {/* Kennzeichen */}
+                  <div>
+                    <label className="block text-sm font-medium text-[#111111] mb-1 flex items-center">
+                      Kennzeichen <span className="text-red-500 ml-0.5">*</span>
+                      <InfoButton text="Das Kennzeichen finden Sie auf Ihrem Fahrzeugschein (Feld A) oder direkt auf dem Nummernschild Ihres Fahrzeugs." />
+                    </label>
+                    <input
+                      type="text"
+                      value={contact.kennzeichen}
+                      onChange={(e) => setContactField("kennzeichen", e.target.value.toUpperCase())}
+                      placeholder="z.B. E-AB 1234"
+                      className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#2563eb] focus:border-transparent font-mono tracking-wider"
+                    />
+                  </div>
+
+                  {/* Sicherheitscode Vorderseite */}
+                  <div>
+                    <label className="block text-sm font-medium text-[#111111] mb-1 flex items-center">
+                      Sicherheitscode (Vorderseite) <span className="text-red-500 ml-0.5">*</span>
+                      <InfoButton text="Den Sicherheitscode finden Sie auf der Zulassungsbescheinigung Teil I (Fahrzeugschein) — ein aufgedruckter Code, der beim Kauf abgekratzt wird. Er befindet sich unten rechts auf dem Dokument." />
+                    </label>
+                    <input
+                      type="text"
+                      value={contact.sicherheitscode_vorne}
+                      onChange={(e) => setContactField("sicherheitscode_vorne", e.target.value.toUpperCase())}
+                      placeholder="z.B. 123ABC"
+                      className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#2563eb] focus:border-transparent font-mono tracking-widest"
+                    />
+                    <p className="text-xs text-gray-400 mt-1">
+                      Zulassungsbescheinigung Teil I — unten rechts, Rubbelfeld
+                    </p>
+                  </div>
+
+                  {/* Sicherheitscode Rückseite */}
+                  <div>
+                    <label className="block text-sm font-medium text-[#111111] mb-1 flex items-center">
+                      Sicherheitscode (Rückseite / Teil II) <span className="text-red-500 ml-0.5">*</span>
+                      <InfoButton text="Den Code finden Sie auf der Zulassungsbescheinigung Teil II (Fahrzeugbrief) — ebenfalls ein aufgedruckter Code unten rechts." />
+                    </label>
+                    <input
+                      type="text"
+                      value={contact.sicherheitscode_hinten}
+                      onChange={(e) => setContactField("sicherheitscode_hinten", e.target.value.toUpperCase())}
+                      placeholder="z.B. XYZ789"
+                      className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#2563eb] focus:border-transparent font-mono tracking-widest"
+                    />
+                    <p className="text-xs text-gray-400 mt-1">
+                      Zulassungsbescheinigung Teil II — unten rechts, Rubbelfeld
+                    </p>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         )}
@@ -424,26 +525,7 @@ export default function AntragPage() {
                 ))}
               </div>
 
-              {/* Sicherheitscode — nur bei Abmeldung */}
-              {service === "abmeldung" && (
-                <div>
-                  <label className="block text-sm font-medium text-[#111111] mb-1">
-                    Sicherheitscode (auf dem Fahrzeugschein, Feld 2) <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    value={contact.sicherheitscode}
-                    onChange={(e) => setContactField("sicherheitscode", e.target.value.toUpperCase())}
-                    placeholder="z.B. ABC123"
-                    className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#2563eb] focus:border-transparent font-mono tracking-widest"
-                  />
-                  <p className="text-xs text-gray-400 mt-1">
-                    Der Sicherheitscode befindet sich auf dem Fahrzeugschein (Zulassungsbescheinigung Teil I) in Feld 2.
-                  </p>
-                </div>
-              )}
-
-              {/* eVB-Nummer — nur bei Anmeldung, falls kein Dokument hochgeladen */}
+              {/* eVB-Nummer — Anmeldung ohne evb-Dokument */}
               {service === "anmeldung" && !files["evb"] && (
                 <div>
                   <label className="block text-sm font-medium text-[#111111] mb-1">
@@ -505,12 +587,24 @@ export default function AntragPage() {
                 <p className="text-sm text-gray-700">{contact.vorname} {contact.nachname}</p>
                 <p className="text-sm text-gray-500">{contact.email} · {contact.telefon}</p>
                 <p className="text-sm text-gray-500">{contact.adresse}, {contact.plz} {contact.ort}</p>
-                {service === "abmeldung" && contact.sicherheitscode && (
-                  <p className="text-sm text-gray-500 mt-1">
-                    Sicherheitscode: <span className="font-mono font-semibold">{contact.sicherheitscode}</span>
-                  </p>
-                )}
               </div>
+              {service === "abmeldung" && (contact.kennzeichen || contact.sicherheitscode_vorne) && (
+                <>
+                  <hr className="border-gray-100" />
+                  <div>
+                    <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Fahrzeugdaten</h3>
+                    {contact.kennzeichen && (
+                      <p className="text-sm text-gray-700">Kennzeichen: <span className="font-mono font-semibold">{contact.kennzeichen}</span></p>
+                    )}
+                    {contact.sicherheitscode_vorne && (
+                      <p className="text-sm text-gray-500">Code Teil I: <span className="font-mono">{contact.sicherheitscode_vorne}</span></p>
+                    )}
+                    {contact.sicherheitscode_hinten && (
+                      <p className="text-sm text-gray-500">Code Teil II: <span className="font-mono">{contact.sicherheitscode_hinten}</span></p>
+                    )}
+                  </div>
+                </>
+              )}
             </div>
 
             {error && (

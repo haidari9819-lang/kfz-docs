@@ -13,7 +13,11 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
-  const { vorname, nachname, email, telefon, adresse, plz, ort, sicherheitscode, evb_nummer } = await req.json();
+  const {
+    vorname, nachname, email, telefon, adresse, plz, ort,
+    evb_nummer,
+    kennzeichen, sicherheitscode_vorne, sicherheitscode_hinten,
+  } = await req.json();
 
   if (!id) {
     return NextResponse.json({ error: "id erforderlich" }, { status: 400 });
@@ -23,15 +27,17 @@ export async function PATCH(
   const { error } = await supabase
     .from("antraege")
     .update({
-      vorname:         vorname         ?? "",
-      nachname:        nachname        ?? "",
-      email:           email           ?? "",
-      telefon:         telefon         ?? "",
-      strasse:         adresse         ?? "",   // Frontend → DB Mapping
-      plz:             plz             ?? "",
-      ort:             ort             ?? "",
-      sicherheitscode: sicherheitscode ?? null,
-      evb_nummer:      evb_nummer      ?? null,
+      vorname:               vorname               ?? "",
+      nachname:              nachname              ?? "",
+      email:                 email                 ?? "",
+      telefon:               telefon               ?? "",
+      strasse:               adresse               ?? "",   // Frontend → DB Mapping
+      plz:                   plz                   ?? "",
+      ort:                   ort                   ?? "",
+      evb_nummer:            evb_nummer            ?? null,
+      kennzeichen:           kennzeichen           ?? null,
+      sicherheitscode_vorne: sicherheitscode_vorne ?? null,
+      sicherheitscode_hinten:sicherheitscode_hinten ?? null,
     })
     .eq("id", id);
 
