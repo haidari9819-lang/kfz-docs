@@ -117,7 +117,10 @@ export default function AntragPage() {
         fd.append("typ", typ);
         const uploadRes = await fetch("/api/upload", { method: "POST", body: fd });
 
-        if (!uploadRes.ok) throw new Error(`Upload fehlgeschlagen: ${typ}`);
+        if (!uploadRes.ok) {
+          const { error: uploadErr } = await uploadRes.json().catch(() => ({ error: null }));
+          throw new Error(uploadErr ?? `Upload fehlgeschlagen: ${typ}`);
+        }
 
         const { ki_daten } = await uploadRes.json();
 

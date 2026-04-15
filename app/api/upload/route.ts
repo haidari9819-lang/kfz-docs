@@ -46,7 +46,11 @@ export async function POST(req: NextRequest) {
     .upload(storagePfad, bytes, { contentType: file.type, upsert: false });
 
   if (uploadError) {
-    return NextResponse.json({ error: uploadError.message }, { status: 500 });
+    console.error("STORAGE UPLOAD FEHLER:", uploadError.message, "| Pfad:", storagePfad);
+    return NextResponse.json(
+      { error: `Storage-Fehler: ${uploadError.message}` },
+      { status: 500 }
+    );
   }
 
   // 2. Eintrag in dokumente Tabelle
@@ -57,7 +61,13 @@ export async function POST(req: NextRequest) {
     .single();
 
   if (dbError || !dokument) {
-    return NextResponse.json({ error: dbError?.message ?? "DB Fehler" }, { status: 500 });
+    console.error("DOKUMENT INSERT FEHLER:", dbError?.message, "| Code:", dbError?.code);
+    // Storage-Datei wieder löschen, damit kein Waise entsteht
+    await supabase.storage.from("kfz-dokumente").remove([storagePfad]);
+    return NextResponse.json(
+      { error: `DB-Fehler: ${dbError?.message ?? "Unbekannt"}` },
+      { status: 500 }
+    );
   }
 
   // 3. Grok Vision — automatisch Felder extrahieren
