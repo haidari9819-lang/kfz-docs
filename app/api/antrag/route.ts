@@ -20,12 +20,25 @@ export async function POST(req: NextRequest) {
   const supabase = getServiceClient();
   const { data, error } = await supabase
     .from("antraege")
-    .insert({ service, vorname, nachname, email, telefon, adresse, plz, ort })
+    .insert({
+      service,
+      vorname:  vorname  ?? "",
+      nachname: nachname ?? "",
+      email:    email    ?? "",
+      telefon:  telefon  ?? "",
+      adresse:  adresse  ?? "",
+      plz:      plz      ?? "",
+      ort:      ort      ?? "",
+    })
     .select("id")
     .single();
 
   if (error || !data) {
-    return NextResponse.json({ error: error?.message ?? "Fehler" }, { status: 500 });
+    console.error("ANTRAG INSERT FEHLER:", JSON.stringify(error, null, 2));
+    return NextResponse.json(
+      { error: error?.message ?? "Unbekannter DB-Fehler", details: error },
+      { status: 500 }
+    );
   }
 
   return NextResponse.json({ antrag_id: data.id });

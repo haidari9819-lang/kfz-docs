@@ -98,8 +98,9 @@ export default function AntragPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ service, vorname: "", nachname: "", email: "draft@pending.de", telefon: "", adresse: "", plz: "", ort: "" }),
       });
-      if (!antragRes.ok) throw new Error("Antrag konnte nicht angelegt werden.");
-      const { antrag_id } = await antragRes.json();
+      const antragJson = await antragRes.json();
+      if (!antragRes.ok) throw new Error(antragJson.error ?? "Antrag konnte nicht angelegt werden.");
+      const { antrag_id } = antragJson;
       setAntragId(antrag_id);
 
       // 2. Dateien hochladen + Grok Vision pro Dokument
