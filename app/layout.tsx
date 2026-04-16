@@ -4,35 +4,55 @@ import "./globals.css";
 export const metadata: Metadata = {
   metadataBase: new URL("https://kfz.qr-docs.de"),
   title: {
-    default: "KFZ Zulassung online NRW — ohne Termin | KFZ-Docs",
-    template: "%s | KFZ-Docs",
+    default: "KFZ Zulassung online NRW ✓ Ohne Termin | Sofort | KFZ-Docs",
+    template: "%s | KFZ-Docs — Online Zulassung NRW",
   },
   description:
-    "Fahrzeug online anmelden, abmelden oder Halterwechsel — ohne Behördengang. KI-gestützt, DSGVO-konform, 24h Service in NRW.",
+    "✓ KFZ Zulassung online in NRW — Anmeldung ab 29€, Abmeldung ab 19€. Ohne Termin, ohne Warteschlange. KI-gestützt, DSGVO-konform. Essen, Dortmund, Köln, Düsseldorf. 24h Service.",
   keywords: [
     "kfz zulassung online",
-    "auto anmelden nrw",
+    "auto anmelden online nrw",
     "fahrzeug abmelden online",
     "halterwechsel ohne termin",
+    "kfz zulassung ohne termin",
+    "auto ummelden nrw",
     "kfz zulassung essen",
     "kfz zulassung dortmund",
     "kfz zulassung köln",
-    "auto ummelden nrw",
-    "ohne Behördengang",
+    "kfz zulassung düsseldorf",
+    "auto anmelden ohne behördengang",
+    "fahrzeug anmelden online nrw",
+    "zulassungsstelle online",
+    "i-kfz online",
+    "auto abmelden ohne termin nrw",
+    "kfz ummelden nrw",
+    "fahrzeugzulassung online",
+    "auto zulassung ohne warteschlange",
   ],
-  alternates: {
-    canonical: "https://kfz.qr-docs.de",
-  },
   openGraph: {
     type: "website",
     locale: "de_DE",
     url: "https://kfz.qr-docs.de",
-    siteName: "KFZ-Docs",
-    title: "KFZ Zulassung online NRW — ohne Termin | KFZ-Docs",
+    title: "KFZ Zulassung online NRW ✓ Ohne Termin — ab 19€",
     description:
-      "Fahrzeug online anmelden, abmelden oder Halterwechsel — ohne Behördengang. KI-gestützt, DSGVO-konform, 24h Service in NRW.",
+      "Fahrzeug online anmelden, abmelden oder Halterwechsel. Ohne Behördengang, ohne Termin. KI-gestützt. 24h Service in ganz NRW.",
+    siteName: "KFZ-Docs",
+    images: [
+      {
+        url: "https://kfz.qr-docs.de/og-image.jpg",
+        width: 1200,
+        height: 630,
+        alt: "KFZ Zulassung online NRW",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "KFZ Zulassung online NRW ✓ Ohne Termin",
+    description: "Anmelden, Abmelden, Halterwechsel — ohne Behördengang. Ab 19€.",
   },
   robots: { index: true, follow: true },
+  alternates: { canonical: "https://kfz.qr-docs.de" },
 };
 
 export default function RootLayout({

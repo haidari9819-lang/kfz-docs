@@ -24,6 +24,38 @@ const jsonLd = {
   ],
 };
 
+const faqLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: [
+    {
+      "@type": "Question",
+      name: "Wie lange dauert die KFZ Zulassung online?",
+      acceptedAnswer: { "@type": "Answer", text: "Nach Eingang aller Dokumente bearbeiten wir Ihren Antrag innerhalb von 24 Stunden." },
+    },
+    {
+      "@type": "Question",
+      name: "Was kostet die KFZ Anmeldung online?",
+      acceptedAnswer: { "@type": "Answer", text: "Die Anmeldung kostet ab 29€ inklusive unserer Servicepauschale. Behördengebühren werden separat berechnet." },
+    },
+    {
+      "@type": "Question",
+      name: "Welche Dokumente brauche ich für die Anmeldung?",
+      acceptedAnswer: { "@type": "Answer", text: "Sie benötigen: Personalausweis, Fahrzeugschein (ZB Teil I), Fahrzeugbrief (ZB Teil II), eVB-Nummer und SEPA-Lastschriftmandat." },
+    },
+    {
+      "@type": "Question",
+      name: "Kann ich mein Auto ohne Termin anmelden?",
+      acceptedAnswer: { "@type": "Answer", text: "Ja! Mit KFZ-Docs können Sie Ihr Fahrzeug vollständig online anmelden — ohne Termin, ohne Warteschlange." },
+    },
+    {
+      "@type": "Question",
+      name: "Ist der Service in ganz NRW verfügbar?",
+      acceptedAnswer: { "@type": "Answer", text: "Ja, wir bearbeiten Anträge aus ganz Nordrhein-Westfalen — Essen, Dortmund, Köln, Düsseldorf und alle weiteren Städte." },
+    },
+  ],
+};
+
 interface Preis {
   service: string;
   name: string;
@@ -72,10 +104,8 @@ export default async function LandingPage() {
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }} />
 
       {/* Nav */}
       <header className="border-b border-gray-100 bg-white sticky top-0 z-10">
