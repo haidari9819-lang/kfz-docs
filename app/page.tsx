@@ -271,6 +271,46 @@ export default async function LandingPage() {
         </section>
       </main>
 
+        {/* Stadt-Links */}
+        <section className="py-14 px-4 border-t border-gray-100">
+          <div className="max-w-5xl mx-auto">
+            <h2 className="text-xl font-bold text-[#111111] mb-2 text-center">KFZ-Zulassung in Ihrer Stadt</h2>
+            <p className="text-gray-500 text-sm text-center mb-8">Verfügbar in ganz Deutschland</p>
+            <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
+              {[
+                { slug: "essen",         name: "Essen" },
+                { slug: "dortmund",      name: "Dortmund" },
+                { slug: "koeln",         name: "Köln" },
+                { slug: "duesseldorf",   name: "Düsseldorf" },
+                { slug: "berlin",        name: "Berlin" },
+                { slug: "hamburg",       name: "Hamburg" },
+                { slug: "muenchen",      name: "München" },
+                { slug: "frankfurt",     name: "Frankfurt" },
+                { slug: "stuttgart",     name: "Stuttgart" },
+                { slug: "bochum",        name: "Bochum" },
+                { slug: "wuppertal",     name: "Wuppertal" },
+                { slug: "bielefeld",     name: "Bielefeld" },
+                { slug: "bonn",          name: "Bonn" },
+                { slug: "muenster",      name: "Münster" },
+                { slug: "aachen",        name: "Aachen" },
+                { slug: "hannover",      name: "Hannover" },
+                { slug: "nuernberg",     name: "Nürnberg" },
+                { slug: "dresden",       name: "Dresden" },
+                { slug: "leipzig",       name: "Leipzig" },
+                { slug: "karlsruhe",     name: "Karlsruhe" },
+              ].map((s) => (
+                <Link
+                  key={s.slug}
+                  href={`/${s.slug}`}
+                  className="text-center text-sm text-gray-500 hover:text-[#2563eb] py-2 px-3 rounded-lg hover:bg-blue-50 transition-colors"
+                >
+                  {s.name}
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+
       <footer className="border-t border-gray-100 py-8 px-4 text-center text-sm text-gray-400">
         <p>© 2025 KFZ-Docs — kfz.qr-docs.de</p>
         <p className="mt-1">Kein Behördenservice. Privatanbieter für Dokumentenservice.</p>
