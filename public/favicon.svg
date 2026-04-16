@@ -1,0 +1,12 @@
+<svg width="32" height="32" viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="56" height="56" rx="14" fill="#2563eb"/>
+  <!-- Auto Body -->
+  <path d="M13 30 L18 22 Q19.5 20 21.5 20 L30.5 20 Q32.5 20 34 22 L39 30 L39 36 Q39 37.5 37.5 37.5 L14.5 37.5 Q13 37.5 13 36 Z" fill="white" opacity="0.95"/>
+  <!-- Räder -->
+  <circle cx="19" cy="38" r="3" fill="#2563eb" stroke="white" stroke-width="1.5"/>
+  <circle cx="33" cy="38" r="3" fill="#2563eb" stroke="white" stroke-width="1.5"/>
+  <!-- Fenster -->
+  <path d="M17 24 L19.5 21 L32.5 21 L35 24 Z" fill="#2563eb" opacity="0.3"/>
+  <!-- Linie -->
+  <rect x="13" y="27" width="26" height="1.5" fill="#2563eb" opacity="0.2"/>
+</svg>
