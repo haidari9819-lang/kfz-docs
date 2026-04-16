@@ -10,13 +10,19 @@ export const metadata: Metadata = {
   description:
     "Fahrzeug online anmelden, abmelden oder Halterwechsel — ohne Behördengang. KI-gestützt, DSGVO-konform, 24h Service in NRW.",
   keywords: [
-    "KFZ Zulassung online",
-    "Auto anmelden NRW",
-    "Fahrzeug abmelden online",
-    "Halterwechsel online",
-    "ohne Termin",
+    "kfz zulassung online",
+    "auto anmelden nrw",
+    "fahrzeug abmelden online",
+    "halterwechsel ohne termin",
+    "kfz zulassung essen",
+    "kfz zulassung dortmund",
+    "kfz zulassung köln",
+    "auto ummelden nrw",
     "ohne Behördengang",
   ],
+  alternates: {
+    canonical: "https://kfz.qr-docs.de",
+  },
   openGraph: {
     type: "website",
     locale: "de_DE",

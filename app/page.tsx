@@ -12,12 +12,16 @@ export const metadata: Metadata = {
 const jsonLd = {
   "@context": "https://schema.org",
   "@type": "Service",
-  name: "KFZ-Docs — Online KFZ-Zulassung NRW",
-  description:
-    "Fahrzeug online anmelden, abmelden oder Halterwechsel — ohne Behördengang. KI-gestützt, DSGVO-konform, 24h Service in NRW.",
+  name: "KFZ Zulassung online NRW",
+  description: "Fahrzeug online anmelden, abmelden oder Halterwechsel ohne Behördengang",
   url: "https://kfz.qr-docs.de",
   provider: { "@type": "Organization", name: "KFZ-Docs", url: "https://kfz.qr-docs.de" },
   areaServed: { "@type": "State", name: "Nordrhein-Westfalen" },
+  offers: [
+    { "@type": "Offer", name: "KFZ Anmeldung",  price: "29", priceCurrency: "EUR" },
+    { "@type": "Offer", name: "KFZ Abmeldung",  price: "19", priceCurrency: "EUR" },
+    { "@type": "Offer", name: "Halterwechsel",   price: "39", priceCurrency: "EUR" },
+  ],
 };
 
 interface Preis {
