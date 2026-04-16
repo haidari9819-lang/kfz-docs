@@ -44,7 +44,7 @@ export default function AnmeldungPage() {
     <div className="min-h-screen bg-white">
       <header className="border-b border-gray-100">
         <div className="max-w-4xl mx-auto px-4 h-14 flex items-center justify-between">
-          <Link href="/"><Image src="/logo.svg" alt="KFZ-Docs Logo" width={140} height={32} priority /></Link>
+          <Link href="/"><Image src="/logo.svg" alt="KFZ-Docs Logo" width={220} height={48} style={{ objectFit: "contain" }} priority /></Link>
           <Link href="/antrag?service=anmeldung" className="bg-[#2563eb] text-white text-sm font-medium px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
             Jetzt anmelden
           </Link>

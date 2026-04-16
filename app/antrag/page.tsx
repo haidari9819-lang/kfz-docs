@@ -250,7 +250,7 @@ export default function AntragPage() {
     <div className="min-h-screen bg-gray-50">
       <header className="bg-white border-b border-gray-100 sticky top-0 z-10">
         <div className="max-w-2xl mx-auto px-4 h-14 flex items-center justify-between">
-          <a href="/"><Image src="/logo.svg" alt="KFZ-Docs Logo" width={140} height={32} priority /></a>
+          <a href="/"><Image src="/logo.svg" alt="KFZ-Docs Logo" width={220} height={48} style={{ objectFit: "contain" }} priority /></a>
           <span className="text-sm text-gray-400">Sicher &amp; verschlüsselt</span>
         </div>
       </header>

@@ -111,7 +111,7 @@ export default async function LandingPage() {
       {/* Nav */}
       <header className="border-b border-gray-100 bg-white sticky top-0 z-10">
         <div className="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between">
-          <Image src="/logo.svg" alt="KFZ-Docs Logo" width={140} height={32} priority />
+          <Image src="/logo.svg" alt="KFZ-Docs Logo" width={220} height={48} style={{ objectFit: "contain" }} priority />
           <Link
             href="/antrag"
             className="bg-[#2563eb] text-white text-sm font-medium px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"

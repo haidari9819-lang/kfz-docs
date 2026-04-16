@@ -128,7 +128,7 @@ export default function AdminPage() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
         <div className="bg-white rounded-2xl border border-gray-200 p-8 w-full max-w-sm shadow-sm">
           <div className="text-center mb-8">
-            <Image src="/logo.svg" alt="KFZ-Docs Logo" width={140} height={32} priority />
+            <Image src="/logo.svg" alt="KFZ-Docs Logo" width={220} height={48} style={{ objectFit: "contain" }} priority />
             <p className="text-gray-500 text-sm">Admin-Bereich</p>
           </div>
           <form onSubmit={handleLogin} className="space-y-4">
@@ -176,7 +176,7 @@ export default function AdminPage() {
       <header className="bg-white border-b border-gray-100 sticky top-0 z-10">
         <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Image src="/logo.svg" alt="KFZ-Docs Logo" width={120} height={28} />
+            <Image src="/logo.svg" alt="KFZ-Docs Logo" width={200} height={44} style={{ objectFit: "contain" }} />
             <span className="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full font-medium">Admin</span>
           </div>
           <div className="flex items-center gap-4">

@@ -76,7 +76,7 @@ export default function AdminPreisePage() {
           <Link href="/admin" className="text-gray-400 hover:text-gray-700 transition-colors">
             <ArrowLeft size={18} />
           </Link>
-          <Image src="/logo.svg" alt="KFZ-Docs Logo" width={120} height={28} />
+          <Image src="/logo.svg" alt="KFZ-Docs Logo" width={200} height={44} style={{ objectFit: "contain" }} />
           <span className="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full font-medium">
             Preise verwalten
           </span>
