@@ -19,7 +19,10 @@
       "Bash(taskkill /F /IM node.exe)",
       "Bash(curl -s -X POST http://localhost:3000/api/antrag -H 'Content-Type: application/json' -d '{\"service\":\"anmeldung\",\"vorname\":\"\",\"nachname\":\"\",\"email\":\"draft@pending.de\",\"telefon\":\"\",\"adresse\":\"\",\"plz\":\"\",\"ort\":\"\"}')",
       "Bash(curl -s http://localhost:3000/)",
-      "Bash(curl:*)"
+      "Bash(curl:*)",
+      "Bash(ls C:/kfz-docs/*.svg)",
+      "Bash(sed -i 's|<div className=\"text-2xl font-bold mb-1\">KFZ<span className=\"text-\\\\[#2563eb\\\\]\">-Docs</span></div>|<Image src=\"/logo.svg\" alt=\"KFZ-Docs Logo\" width={140} height={32} priority />|g' C:/kfz-docs/app/admin/page.tsx)",
+      "Bash(sed -i 's|<span className=\"font-bold text-lg tracking-tight\">KFZ<span className=\"text-\\\\[#2563eb\\\\]\">-Docs</span></span>|<Image src=\"/logo.svg\" alt=\"KFZ-Docs Logo\" width={120} height={28} />|g' C:/kfz-docs/app/admin/page.tsx)"
     ]
   }
 }

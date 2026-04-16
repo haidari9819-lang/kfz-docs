@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Save, ArrowLeft, Loader2, CheckCircle, AlertCircle } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 
 interface Preis {
   service: string;
@@ -75,9 +76,7 @@ export default function AdminPreisePage() {
           <Link href="/admin" className="text-gray-400 hover:text-gray-700 transition-colors">
             <ArrowLeft size={18} />
           </Link>
-          <span className="font-bold text-lg tracking-tight">
-            KFZ<span className="text-[#2563eb]">-Docs</span>
-          </span>
+          <Image src="/logo.svg" alt="KFZ-Docs Logo" width={120} height={28} />
           <span className="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full font-medium">
             Preise verwalten
           </span>

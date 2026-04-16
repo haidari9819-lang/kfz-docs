@@ -2,9 +2,10 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import {
   LogIn, Download, RefreshCw, Eye, EyeOff,
-  Settings, Loader2, AlertCircle,
+  Settings, Loader2, AlertCircle, FileText,
 } from "lucide-react";
 
 type Status = "ausstehend" | "in_bearbeitung" | "erledigt";
@@ -127,7 +128,7 @@ export default function AdminPage() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
         <div className="bg-white rounded-2xl border border-gray-200 p-8 w-full max-w-sm shadow-sm">
           <div className="text-center mb-8">
-            <div className="text-2xl font-bold mb-1">KFZ<span className="text-[#2563eb]">-Docs</span></div>
+            <Image src="/logo.svg" alt="KFZ-Docs Logo" width={140} height={32} priority />
             <p className="text-gray-500 text-sm">Admin-Bereich</p>
           </div>
           <form onSubmit={handleLogin} className="space-y-4">
@@ -175,7 +176,7 @@ export default function AdminPage() {
       <header className="bg-white border-b border-gray-100 sticky top-0 z-10">
         <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <span className="font-bold text-lg tracking-tight">KFZ<span className="text-[#2563eb]">-Docs</span></span>
+            <Image src="/logo.svg" alt="KFZ-Docs Logo" width={120} height={28} />
             <span className="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full font-medium">Admin</span>
           </div>
           <div className="flex items-center gap-4">
@@ -295,19 +296,44 @@ export default function AdminPage() {
                           </div>
                         </td>
                         <td className="px-6 py-4">
-                          {cfg.next ? (
-                            <button
-                              onClick={() => advanceStatus(antrag)}
-                              disabled={updatingId === antrag.id}
-                              className="text-xs bg-[#2563eb] text-white px-3 py-1.5 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 whitespace-nowrap flex items-center gap-1"
+                          <div className="flex flex-col gap-1.5">
+                            {cfg.next ? (
+                              <button
+                                onClick={() => advanceStatus(antrag)}
+                                disabled={updatingId === antrag.id}
+                                className="text-xs bg-[#2563eb] text-white px-3 py-1.5 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 whitespace-nowrap flex items-center gap-1"
+                              >
+                                {updatingId === antrag.id
+                                  ? <Loader2 size={12} className="animate-spin" />
+                                  : `→ ${STATUS_CONFIG[cfg.next].label}`}
+                              </button>
+                            ) : (
+                              <span className="text-xs text-gray-300">—</span>
+                            )}
+                            <a
+                              href={`/api/admin/vollmacht/${antrag.id}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                fetch(`/api/admin/vollmacht/${antrag.id}`, {
+                                  headers: { "x-admin-password": password },
+                                })
+                                  .then((r) => r.blob())
+                                  .then((blob) => {
+                                    const url = URL.createObjectURL(blob);
+                                    const a = document.createElement("a");
+                                    a.href = url;
+                                    a.download = `Vollmacht_${antrag.id.substring(0,8).toUpperCase()}.pdf`;
+                                    a.click();
+                                    URL.revokeObjectURL(url);
+                                  });
+                              }}
+                              className="text-xs bg-gray-100 hover:bg-gray-200 text-gray-600 px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap flex items-center gap-1 cursor-pointer"
                             >
-                              {updatingId === antrag.id
-                                ? <Loader2 size={12} className="animate-spin" />
-                                : `→ ${STATUS_CONFIG[cfg.next].label}`}
-                            </button>
-                          ) : (
-                            <span className="text-xs text-gray-300">—</span>
-                          )}
+                              <FileText size={11} /> Vollmacht
+                            </a>
+                          </div>
                         </td>
                       </tr>
                     );

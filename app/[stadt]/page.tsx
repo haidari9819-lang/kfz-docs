@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import { CheckCircle, ChevronRight, Clock, Shield, Zap } from "lucide-react";
 
@@ -115,7 +116,7 @@ export default async function StadtPage(
 
       <header className="border-b border-gray-100">
         <div className="max-w-4xl mx-auto px-4 h-14 flex items-center justify-between">
-          <Link href="/" className="font-bold text-lg tracking-tight">KFZ<span className="text-[#2563eb]">-Docs</span></Link>
+          <Link href="/"><Image src="/logo.svg" alt="KFZ-Docs Logo" width={140} height={32} priority /></Link>
           <Link href="/antrag" className="bg-[#2563eb] text-white text-sm font-medium px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
             Jetzt starten
           </Link>

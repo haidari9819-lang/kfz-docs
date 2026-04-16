@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Image from "next/image";
 import { Shield, Clock, CheckCircle, Lock, FileCheck, Zap } from "lucide-react";
 import { createClient } from "@supabase/supabase-js";
 
@@ -110,9 +111,7 @@ export default async function LandingPage() {
       {/* Nav */}
       <header className="border-b border-gray-100 bg-white sticky top-0 z-10">
         <div className="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between">
-          <span className="font-bold text-lg tracking-tight">
-            KFZ<span className="text-[#2563eb]">-Docs</span>
-          </span>
+          <Image src="/logo.svg" alt="KFZ-Docs Logo" width={140} height={32} priority />
           <Link
             href="/antrag"
             className="bg-[#2563eb] text-white text-sm font-medium px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"

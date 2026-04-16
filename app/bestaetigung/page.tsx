@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Image from "next/image";
 import { CheckCircle, Clock, Search, FileCheck, Mail } from "lucide-react";
 import { createClient } from "@supabase/supabase-js";
 
@@ -66,9 +67,7 @@ export default async function BestaetigungPage({ searchParams }: PageProps) {
     <div className="min-h-screen bg-gray-50">
       <header className="bg-white border-b border-gray-100">
         <div className="max-w-2xl mx-auto px-4 h-14 flex items-center">
-          <a href="/" className="font-bold text-lg tracking-tight">
-            KFZ<span className="text-[#2563eb]">-Docs</span>
-          </a>
+          <a href="/"><Image src="/logo.svg" alt="KFZ-Docs Logo" width={140} height={32} priority /></a>
         </div>
       </header>
 
