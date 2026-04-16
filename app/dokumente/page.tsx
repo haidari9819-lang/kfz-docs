@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 const CHECKLISTEN = [
   {
     service: "Anmeldung",
-    preis: "29€",
+    preis: "49€",
     href: "/antrag?service=anmeldung",
     pflicht: [
       "Personalausweis (Vorder- & Rückseite)",
@@ -27,7 +27,7 @@ const CHECKLISTEN = [
   },
   {
     service: "Abmeldung",
-    preis: "19€",
+    preis: "39€",
     href: "/antrag?service=abmeldung",
     pflicht: [
       "Personalausweis (Vorder- & Rückseite)",

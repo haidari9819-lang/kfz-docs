@@ -5,14 +5,14 @@ import { ChevronRight, CheckCircle } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "KFZ Zulassung Kosten NRW — transparente Preise",
-  description: "Alle Kosten der KFZ Zulassung in NRW im Überblick: Servicepauschalen, Behördengebühren, Kennzeichenkosten. Anmeldung ab 29€, Abmeldung ab 19€.",
+  description: "Alle Kosten der KFZ Zulassung in NRW im Überblick: Servicepauschalen, Behördengebühren, Kennzeichenkosten. Anmeldung ab 49€, Abmeldung ab 39€.",
   alternates: { canonical: "https://kfz.qr-docs.de/kosten" },
 };
 
 const PREISE = [
-  { service: "Anmeldung", servicePauschale: 29, behoerde: "26–30", gesamt: "55–59", href: "/antrag?service=anmeldung" },
-  { service: "Abmeldung", servicePauschale: 19, behoerde: "6–10",  gesamt: "25–29", href: "/antrag?service=abmeldung" },
-  { service: "Halterwechsel", servicePauschale: 39, behoerde: "26–30", gesamt: "65–69", href: "/antrag?service=halterwechsel" },
+  { service: "Anmeldung", servicePauschale: 49, behoerde: "26–30", gesamt: "75–79", href: "/antrag?service=anmeldung" },
+  { service: "Abmeldung", servicePauschale: 39, behoerde: "6–10",  gesamt: "45–49", href: "/antrag?service=abmeldung" },
+  { service: "Halterwechsel", servicePauschale: 69, behoerde: "26–30", gesamt: "95–99", href: "/antrag?service=halterwechsel" },
 ];
 
 const FAQ = [

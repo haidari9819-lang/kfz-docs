@@ -10,9 +10,9 @@ import {
 type Service = "anmeldung" | "abmeldung" | "halterwechsel";
 
 const SERVICES: { id: Service; label: string; price: string; icon: React.ReactNode }[] = [
-  { id: "anmeldung",    label: "Anmeldung",    price: "29€", icon: <Car size={28} /> },
-  { id: "abmeldung",   label: "Abmeldung",    price: "19€", icon: <FileText size={28} /> },
-  { id: "halterwechsel",label: "Halterwechsel",price: "39€", icon: <UserCheck size={28} /> },
+  { id: "anmeldung",    label: "Anmeldung",    price: "49€", icon: <Car size={28} /> },
+  { id: "abmeldung",   label: "Abmeldung",    price: "39€", icon: <FileText size={28} /> },
+  { id: "halterwechsel",label: "Halterwechsel",price: "69€", icon: <UserCheck size={28} /> },
 ];
 
 interface DocDef { key: string; label: string; optional?: boolean }

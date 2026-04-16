@@ -5,7 +5,7 @@ import { CheckCircle, ChevronRight, Clock, Shield, Zap } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Auto anmelden online NRW — ohne Behördengang",
-  description: "Auto online anmelden in NRW — ohne Termin, ohne Warteschlange. Personalausweis, Fahrzeugschein & Co. hochladen, wir erledigen den Rest. Ab 29€. Fertig in 24h.",
+  description: "Auto online anmelden in NRW — ohne Termin, ohne Warteschlange. Personalausweis, Fahrzeugschein & Co. hochladen, wir erledigen den Rest. Ab 49€. Fertig in 24h.",
   alternates: { canonical: "https://kfz.qr-docs.de/anmeldung" },
 };
 
@@ -23,7 +23,7 @@ const FAQ = [
   },
   {
     q: "Wie viel kostet die Online-Anmeldung?",
-    a: "Unsere Servicepauschale beträgt 29€. Zusätzlich fallen die behördlichen Zulassungsgebühren an (ca. 26–30€ je nach Stadt).",
+    a: "Unsere Servicepauschale beträgt 49€. Zusätzlich fallen die behördlichen Zulassungsgebühren an (ca. 26–30€ je nach Stadt).",
   },
   {
     q: "Wie lange dauert die Anmeldung?",
@@ -117,7 +117,7 @@ export default function AnmeldungPage() {
           <div>
             <div className="font-bold text-[#111111] text-xl mb-1">KFZ Anmeldung online</div>
             <div className="text-gray-500">Servicepauschale</div>
-            <div className="text-4xl font-bold text-[#2563eb] mt-1">29€</div>
+            <div className="text-4xl font-bold text-[#2563eb] mt-1">49€</div>
             <div className="text-xs text-gray-400 mt-1">zzgl. Behördengebühren ca. 26–30€</div>
           </div>
           <Link href="/antrag?service=anmeldung"

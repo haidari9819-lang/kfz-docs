@@ -49,7 +49,7 @@ export async function generateMetadata(
   if (!stadt) return {};
   return {
     title: `KFZ Zulassung ${stadt.name} online — ohne Termin`,
-    description: `KFZ Zulassung ${stadt.name} online: Auto anmelden, abmelden oder Halterwechsel — ohne Termin, ohne Behördengang. Ab 19€. 24h Service.`,
+    description: `KFZ Zulassung ${stadt.name} online: Auto anmelden, abmelden oder Halterwechsel — ohne Termin, ohne Behördengang. Ab 39€. 24h Service.`,
     alternates: { canonical: `https://kfz.qr-docs.de/${stadt.slug}` },
   };
 }
@@ -72,7 +72,7 @@ export default async function StadtPage(
     },
     {
       q: `Was kostet die KFZ Anmeldung in ${stadt.name}?`,
-      a: `Unsere Servicepauschale beträgt ab 29€. Dazu kommen die regulären Behördengebühren der Zulassungsstelle ${stadt.name}.`,
+      a: `Unsere Servicepauschale beträgt ab 39€. Dazu kommen die regulären Behördengebühren der Zulassungsstelle ${stadt.name}.`,
     },
     {
       q: `Kann ich ein ${stadt.kfz}-Kennzeichen online beantragen?`,
@@ -93,9 +93,9 @@ export default async function StadtPage(
     provider: { "@type": "Organization", name: "KFZ-Docs", url: "https://kfz.qr-docs.de" },
     areaServed: { "@type": "City", name: stadt.name },
     offers: [
-      { "@type": "Offer", name: "Anmeldung",    price: "29", priceCurrency: "EUR" },
-      { "@type": "Offer", name: "Abmeldung",    price: "19", priceCurrency: "EUR" },
-      { "@type": "Offer", name: "Halterwechsel",price: "39", priceCurrency: "EUR" },
+      { "@type": "Offer", name: "Anmeldung",    price: "49", priceCurrency: "EUR" },
+      { "@type": "Offer", name: "Abmeldung",    price: "39", priceCurrency: "EUR" },
+      { "@type": "Offer", name: "Halterwechsel",price: "69", priceCurrency: "EUR" },
     ],
   };
 
@@ -138,9 +138,9 @@ export default async function StadtPage(
         {/* Preiskacheln */}
         <div className="grid sm:grid-cols-3 gap-4 mb-14">
           {[
-            { title: `Anmeldung ${stadt.name}`,    price: "ab 29€", href: "/antrag?service=anmeldung" },
-            { title: `Abmeldung ${stadt.name}`,    price: "ab 19€", href: "/antrag?service=abmeldung" },
-            { title: `Halterwechsel ${stadt.name}`,price: "ab 39€", href: "/antrag?service=halterwechsel" },
+            { title: `Anmeldung ${stadt.name}`,    price: "ab 49€", href: "/antrag?service=anmeldung" },
+            { title: `Abmeldung ${stadt.name}`,    price: "ab 39€", href: "/antrag?service=abmeldung" },
+            { title: `Halterwechsel ${stadt.name}`,price: "ab 69€", href: "/antrag?service=halterwechsel" },
           ].map((s) => (
             <Link key={s.title} href={s.href}
               className="border-2 border-gray-200 hover:border-[#2563eb] rounded-2xl p-5 transition-all group">

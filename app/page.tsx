@@ -19,9 +19,9 @@ const jsonLd = {
   provider: { "@type": "Organization", name: "KFZ-Docs", url: "https://kfz.qr-docs.de" },
   areaServed: { "@type": "State", name: "Nordrhein-Westfalen" },
   offers: [
-    { "@type": "Offer", name: "KFZ Anmeldung",  price: "29", priceCurrency: "EUR" },
-    { "@type": "Offer", name: "KFZ Abmeldung",  price: "19", priceCurrency: "EUR" },
-    { "@type": "Offer", name: "Halterwechsel",   price: "39", priceCurrency: "EUR" },
+    { "@type": "Offer", name: "KFZ Anmeldung",  price: "49", priceCurrency: "EUR" },
+    { "@type": "Offer", name: "KFZ Abmeldung",  price: "39", priceCurrency: "EUR" },
+    { "@type": "Offer", name: "Halterwechsel",   price: "69", priceCurrency: "EUR" },
   ],
 };
 
@@ -37,7 +37,7 @@ const faqLd = {
     {
       "@type": "Question",
       name: "Was kostet die KFZ Anmeldung online?",
-      acceptedAnswer: { "@type": "Answer", text: "Die Anmeldung kostet ab 29€ inklusive unserer Servicepauschale. Behördengebühren werden separat berechnet." },
+      acceptedAnswer: { "@type": "Answer", text: "Die Anmeldung kostet ab 49€ inklusive unserer Servicepauschale. Behördengebühren werden separat berechnet." },
     },
     {
       "@type": "Question",

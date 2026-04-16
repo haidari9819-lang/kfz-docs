@@ -5,7 +5,7 @@ import { CheckCircle, ChevronRight, Clock, Shield, Zap } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Auto abmelden online NRW — sofort & ohne Termin",
-  description: "Auto online abmelden in NRW — ohne Termin, ohne Behördengang. Fahrzeugschein hochladen, wir erledigen die Abmeldung. Ab 19€. Fertig in 24h.",
+  description: "Auto online abmelden in NRW — ohne Termin, ohne Behördengang. Fahrzeugschein hochladen, wir erledigen die Abmeldung. Ab 39€. Fertig in 24h.",
   alternates: { canonical: "https://kfz.qr-docs.de/abmeldung" },
 };
 
@@ -117,7 +117,7 @@ export default function AbmeldungPage() {
           <div>
             <div className="font-bold text-[#111111] text-xl mb-1">KFZ Abmeldung online</div>
             <div className="text-gray-500">Servicepauschale</div>
-            <div className="text-4xl font-bold text-[#2563eb] mt-1">19€</div>
+            <div className="text-4xl font-bold text-[#2563eb] mt-1">39€</div>
             <div className="text-xs text-gray-400 mt-1">zzgl. Behördengebühren ca. 6–10€</div>
           </div>
           <Link href="/antrag?service=abmeldung"

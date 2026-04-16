@@ -8,7 +8,7 @@ export const metadata: Metadata = {
     template: "%s | KFZ-Docs — Online Zulassung NRW",
   },
   description:
-    "✓ KFZ Zulassung online in NRW — Anmeldung ab 29€, Abmeldung ab 19€. Ohne Termin, ohne Warteschlange. KI-gestützt, DSGVO-konform. Essen, Dortmund, Köln, Düsseldorf. 24h Service.",
+    "✓ KFZ Zulassung online in NRW — Anmeldung ab 49€, Abmeldung ab 39€. Ohne Termin, ohne Warteschlange. KI-gestützt, DSGVO-konform. Essen, Dortmund, Köln, Düsseldorf. 24h Service.",
   keywords: [
     "kfz zulassung online",
     "auto anmelden online nrw",
@@ -33,7 +33,7 @@ export const metadata: Metadata = {
     type: "website",
     locale: "de_DE",
     url: "https://kfz.qr-docs.de",
-    title: "KFZ Zulassung online NRW ✓ Ohne Termin — ab 19€",
+    title: "KFZ Zulassung online NRW ✓ Ohne Termin — ab 39€",
     description:
       "Fahrzeug online anmelden, abmelden oder Halterwechsel. Ohne Behördengang, ohne Termin. KI-gestützt. 24h Service in ganz NRW.",
     siteName: "KFZ-Docs",
@@ -49,7 +49,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "KFZ Zulassung online NRW ✓ Ohne Termin",
-    description: "Anmelden, Abmelden, Halterwechsel — ohne Behördengang. Ab 19€.",
+    description: "Anmelden, Abmelden, Halterwechsel — ohne Behördengang. Ab 39€.",
   },
   robots: { index: true, follow: true },
   alternates: { canonical: "https://kfz.qr-docs.de" },
