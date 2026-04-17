@@ -310,10 +310,6 @@ export default async function LandingPage() {
           </div>
         </section>
 
-      <footer className="border-t border-gray-100 py-8 px-4 text-center text-sm text-gray-400">
-        <p>© 2025 KFZ-Docs — kfz.qr-docs.de</p>
-        <p className="mt-1">Kein Behördenservice. Privatanbieter für Dokumentenservice.</p>
-      </footer>
     </>
   );
 }

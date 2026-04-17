@@ -75,7 +75,13 @@ export default function RootLayout({
         <div className="flex-1">{children}</div>
         <footer className="border-t border-gray-100 py-6">
           <div className="max-w-6xl mx-auto px-6 flex flex-wrap gap-6 items-center justify-between">
-            <span className="text-xs text-gray-400">© {new Date().getFullYear()} KFZ-Docs — Mirwais Haidari</span>
+            <div className="flex flex-col gap-1">
+              <span className="text-xs text-gray-400">© {new Date().getFullYear()} KFZ-Docs — Powered by QR-Docs</span>
+              <div className="flex gap-4 text-xs text-gray-400">
+                <a href="mailto:haidari9819@gmail.com" className="hover:text-gray-600 transition-colors">haidari9819@gmail.com</a>
+                <a href="tel:+4917680822282" className="hover:text-gray-600 transition-colors">0176 80822282</a>
+              </div>
+            </div>
             <nav className="flex gap-6 text-xs text-gray-400">
               <Link href="/impressum" className="hover:text-gray-600 transition-colors">Impressum</Link>
               <Link href="/datenschutz" className="hover:text-gray-600 transition-colors">Datenschutz</Link>
