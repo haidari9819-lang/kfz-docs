@@ -311,12 +311,12 @@ export default function AdminPage() {
                               <span className="text-xs text-gray-300">—</span>
                             )}
                             <a
-                              href={`/api/admin/vollmacht/${antrag.id}`}
+                              href={`/api/admin/vollmacht?id=${antrag.id}`}
                               target="_blank"
                               rel="noopener noreferrer"
                               onClick={(e) => {
                                 e.preventDefault();
-                                fetch(`/api/admin/vollmacht/${antrag.id}`, {
+                                fetch(`/api/admin/vollmacht?id=${antrag.id}`, {
                                   headers: { "x-admin-password": password },
                                 })
                                   .then((r) => r.blob())
@@ -324,7 +324,7 @@ export default function AdminPage() {
                                     const url = URL.createObjectURL(blob);
                                     const a = document.createElement("a");
                                     a.href = url;
-                                    a.download = `Vollmacht_${antrag.id.substring(0,8).toUpperCase()}.pdf`;
+                                    a.download = `Vollmacht_${antrag.vorname}_${antrag.nachname}.pdf`;
                                     a.click();
                                     URL.revokeObjectURL(url);
                                   });
