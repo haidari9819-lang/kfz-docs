@@ -96,7 +96,7 @@ export async function extrahiereDokument(
   const prompt = PROMPTS[dokumentTyp] ?? "Extrahiere alle relevanten Daten als JSON.";
 
   const response = await grok.chat.completions.create({
-    model: "grok-2-vision-1212",
+    model: "grok-2-vision-latest",
     messages: [
       {
         role: "user",
