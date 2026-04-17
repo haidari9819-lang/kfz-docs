@@ -1,8 +1,7 @@
 import sharp from 'sharp'
 import { readFileSync } from 'fs'
 
-// Use the square icon SVG (not the wide logo)
-const svg = readFileSync('public/favicon.svg')
+const svg = readFileSync('public/logo.svg')
 
 await sharp(svg).resize(32, 32).png().toFile('public/favicon-32.png')
 await sharp(svg).resize(16, 16).png().toFile('public/favicon-16.png')
