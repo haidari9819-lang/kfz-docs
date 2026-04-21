@@ -55,12 +55,7 @@ export async function GET(
 
   const { data: antrag, error } = await supabase
     .from("antraege")
-    .select(
-      "id, vorname, nachname, service, " +
-      "sepa_kontoinhaber, sepa_iban, sepa_bic, sepa_kreditinstitut, " +
-      "sepa_adresse, sepa_unterschrift_url, sepa_mandat_datum, " +
-      "agb_akzeptiert, vollmacht_erteilt, datenschutz_akzeptiert"
-    )
+    .select("*")
     .eq("id", antragsId)
     .single();
 
