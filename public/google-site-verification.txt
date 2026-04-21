@@ -1,0 +1,9 @@
+# Google Search Console Verification Code hier eintragen
+# Beispiel: google-site-verification: abcdef1234567890abcdef1234567890abcdef12
+#
+# Anleitung:
+# 1. Google Search Console öffnen: https://search.google.com/search-console
+# 2. Property hinzufügen: https://kfz.qr-docs.de
+# 3. Verifizierungsmethode "HTML-Datei" wählen
+# 4. Den generierten Code in diese Datei einfügen
+# 5. Datei deployen und in der Search Console auf "Verifizieren" klicken
