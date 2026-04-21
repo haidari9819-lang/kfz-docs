@@ -6,6 +6,7 @@ import Image from "next/image";
 import {
   LogIn, Download, RefreshCw, Eye, EyeOff,
   Settings, Loader2, AlertCircle, FileText,
+  ChevronDown, ChevronUp, Copy, Check,
 } from "lucide-react";
 
 type Status = "ausstehend" | "in_bearbeitung" | "erledigt";
@@ -28,12 +29,23 @@ interface Antrag {
   betrag: number | null;
   created_at: string;
   dokumente: Dokument[];
+  // SEPA
+  sepa_kontoinhaber: string | null;
+  sepa_iban: string | null;
+  sepa_bic: string | null;
+  sepa_kreditinstitut: string | null;
+  sepa_adresse: string | null;
+  sepa_unterschrift_url: string | null;
+  sepa_mandat_datum: string | null;
+  agb_akzeptiert: boolean | null;
+  vollmacht_erteilt: boolean | null;
+  datenschutz_akzeptiert: boolean | null;
 }
 
 const STATUS_CONFIG: Record<Status, { label: string; bg: string; text: string; next: Status | null }> = {
-  ausstehend:    { label: "Ausstehend",    bg: "bg-yellow-100", text: "text-yellow-800", next: "in_bearbeitung" },
-  in_bearbeitung:{ label: "In Bearbeitung",bg: "bg-blue-100",   text: "text-blue-800",   next: "erledigt" },
-  erledigt:      { label: "Erledigt",      bg: "bg-green-100",  text: "text-green-800",  next: null },
+  ausstehend:    { label: "Ausstehend",     bg: "bg-yellow-100", text: "text-yellow-800", next: "in_bearbeitung" },
+  in_bearbeitung:{ label: "In Bearbeitung", bg: "bg-blue-100",   text: "text-blue-800",   next: "erledigt" },
+  erledigt:      { label: "Erledigt",       bg: "bg-green-100",  text: "text-green-800",  next: null },
 };
 
 const SERVICE_LABELS: Record<string, string> = {
@@ -41,6 +53,10 @@ const SERVICE_LABELS: Record<string, string> = {
   abmeldung: "Abmeldung",
   halterwechsel: "Halterwechsel",
 };
+
+function formatIBAN(iban: string) {
+  return iban.match(/.{1,4}/g)?.join(" ") ?? iban;
+}
 
 export default function AdminPage() {
   const [authed, setAuthed] = useState(false);
@@ -55,6 +71,13 @@ export default function AdminPage() {
   const [filter, setFilter] = useState<Status | "alle">("alle");
   const [updatingId, setUpdatingId] = useState<string | null>(null);
 
+  // Welche Zeile hat das SEPA-Panel offen
+  const [expandedSepa, setExpandedSepa] = useState<string | null>(null);
+  // Zeige Unterschrift-Modal
+  const [sigModal, setSigModal] = useState<string | null>(null);
+  // IBAN kopiert-Feedback
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+
   const loadAntraege = useCallback(async (pw: string) => {
     setDataLoading(true);
     setDataError("");
@@ -63,8 +86,7 @@ export default function AdminPage() {
         headers: { "x-admin-password": pw },
       });
       if (!res.ok) throw new Error("Fehler beim Laden");
-      const data = await res.json();
-      setAntraege(data);
+      setAntraege(await res.json());
     } catch {
       setDataError("Daten konnten nicht geladen werden.");
     } finally {
@@ -76,13 +98,11 @@ export default function AdminPage() {
     e.preventDefault();
     setLoginLoading(true);
     setLoginError("");
-    // Prüfung via API — Passwort verlässt nie den Client ungeprüft
     const res = await fetch("/api/admin/antraege", {
       headers: { "x-admin-password": password },
     });
     if (res.ok) {
-      const data = await res.json();
-      setAntraege(data);
+      setAntraege(await res.json());
       setAuthed(true);
     } else {
       setLoginError("Falsches Passwort.");
@@ -120,9 +140,28 @@ export default function AdminPage() {
     window.open(url, "_blank");
   };
 
+  const downloadPdf = (endpoint: string, filename: string) => {
+    fetch(endpoint, { headers: { "x-admin-password": password } })
+      .then((r) => r.blob())
+      .then((blob) => {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = filename;
+        a.click();
+        URL.revokeObjectURL(url);
+      });
+  };
+
+  const copyIBAN = (iban: string, id: string) => {
+    navigator.clipboard.writeText(iban);
+    setCopiedId(id);
+    setTimeout(() => setCopiedId(null), 2000);
+  };
+
   const filtered = filter === "alle" ? antraege : antraege.filter((a) => a.status === filter);
 
-  // Login
+  // ── Login ────────────────────────────────────────────────────────────────
   if (!authed) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
@@ -170,7 +209,7 @@ export default function AdminPage() {
     );
   }
 
-  // Dashboard
+  // ── Dashboard ────────────────────────────────────────────────────────────
   return (
     <div className="min-h-screen bg-gray-50">
       <header className="bg-white border-b border-gray-100 sticky top-0 z-10">
@@ -248,94 +287,209 @@ export default function AdminPage() {
                     ))}
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-50">
+                <tbody>
                   {filtered.length === 0 ? (
                     <tr>
                       <td colSpan={7} className="px-6 py-12 text-center text-gray-400">Keine Anträge gefunden.</td>
                     </tr>
                   ) : filtered.map((antrag) => {
                     const cfg = STATUS_CONFIG[antrag.status];
+                    const sepaOpen = expandedSepa === antrag.id;
+                    const hasSepa = !!antrag.sepa_iban;
+
                     return (
-                      <tr key={antrag.id} className="hover:bg-gray-50 transition-colors">
-                        <td className="px-6 py-4 text-xs text-gray-400 whitespace-nowrap">
-                          {new Date(antrag.created_at).toLocaleString("de-DE", {
-                            day: "2-digit", month: "2-digit", year: "2-digit",
-                            hour: "2-digit", minute: "2-digit",
-                          })}
-                        </td>
-                        <td className="px-6 py-4">
-                          <div className="font-medium text-[#111111]">{antrag.vorname} {antrag.nachname}</div>
-                          <div className="text-xs text-gray-400">{antrag.email}</div>
-                        </td>
-                        <td className="px-6 py-4 text-gray-700">
-                          {SERVICE_LABELS[antrag.service] ?? antrag.service}
-                        </td>
-                        <td className="px-6 py-4">
-                          <span className={`inline-flex px-2.5 py-1 rounded-full text-xs font-semibold ${cfg.bg} ${cfg.text}`}>
-                            {cfg.label}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4">
-                          <span className={`text-xs font-semibold ${antrag.bezahlt ? "text-green-600" : "text-gray-400"}`}>
-                            {antrag.bezahlt ? `✓ ${antrag.betrag ? `${antrag.betrag / 100}€` : ""}` : "Ausstehend"}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4">
-                          <div className="flex flex-wrap gap-1">
-                            {antrag.dokumente?.map((dok) => (
+                      <>
+                        <tr key={antrag.id} className="hover:bg-gray-50 transition-colors border-b border-gray-50">
+                          <td className="px-6 py-4 text-xs text-gray-400 whitespace-nowrap">
+                            {new Date(antrag.created_at).toLocaleString("de-DE", {
+                              day: "2-digit", month: "2-digit", year: "2-digit",
+                              hour: "2-digit", minute: "2-digit",
+                            })}
+                          </td>
+                          <td className="px-6 py-4">
+                            <div className="font-medium text-[#111111]">{antrag.vorname} {antrag.nachname}</div>
+                            <div className="text-xs text-gray-400">{antrag.email}</div>
+                          </td>
+                          <td className="px-6 py-4 text-gray-700">
+                            {SERVICE_LABELS[antrag.service] ?? antrag.service}
+                          </td>
+                          <td className="px-6 py-4">
+                            <span className={`inline-flex px-2.5 py-1 rounded-full text-xs font-semibold ${cfg.bg} ${cfg.text}`}>
+                              {cfg.label}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4">
+                            <span className={`text-xs font-semibold ${antrag.bezahlt ? "text-green-600" : "text-gray-400"}`}>
+                              {antrag.bezahlt ? `✓ ${antrag.betrag ? `${antrag.betrag / 100}€` : ""}` : "Ausstehend"}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4">
+                            <div className="flex flex-wrap gap-1">
+                              {antrag.dokumente?.map((dok) => (
+                                <button
+                                  key={dok.id}
+                                  onClick={() => downloadDokument(dok.storage_path, dok.dateiname)}
+                                  title={dok.dateiname}
+                                  className="inline-flex items-center gap-1 bg-gray-100 hover:bg-gray-200 text-gray-600 px-2 py-1 rounded-lg text-xs transition-colors"
+                                >
+                                  <Download size={10} />
+                                  {dok.typ}
+                                </button>
+                              ))}
+                            </div>
+                          </td>
+                          <td className="px-6 py-4">
+                            <div className="flex flex-col gap-1.5">
+                              {cfg.next && (
+                                <button
+                                  onClick={() => advanceStatus(antrag)}
+                                  disabled={updatingId === antrag.id}
+                                  className="text-xs bg-[#2563eb] text-white px-3 py-1.5 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 whitespace-nowrap flex items-center gap-1"
+                                >
+                                  {updatingId === antrag.id
+                                    ? <Loader2 size={12} className="animate-spin" />
+                                    : `→ ${STATUS_CONFIG[cfg.next].label}`}
+                                </button>
+                              )}
                               <button
-                                key={dok.id}
-                                onClick={() => downloadDokument(dok.storage_path, dok.dateiname)}
-                                title={dok.dateiname}
-                                className="inline-flex items-center gap-1 bg-gray-100 hover:bg-gray-200 text-gray-600 px-2 py-1 rounded-lg text-xs transition-colors"
+                                onClick={() =>
+                                  downloadPdf(
+                                    `/api/admin/vollmacht?id=${antrag.id}`,
+                                    `Vollmacht_${antrag.vorname}_${antrag.nachname}.pdf`
+                                  )
+                                }
+                                className="text-xs bg-gray-100 hover:bg-gray-200 text-gray-600 px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap flex items-center gap-1"
                               >
-                                <Download size={10} />
-                                {dok.typ}
+                                <FileText size={11} /> Vollmacht
                               </button>
-                            ))}
-                          </div>
-                        </td>
-                        <td className="px-6 py-4">
-                          <div className="flex flex-col gap-1.5">
-                            {cfg.next ? (
-                              <button
-                                onClick={() => advanceStatus(antrag)}
-                                disabled={updatingId === antrag.id}
-                                className="text-xs bg-[#2563eb] text-white px-3 py-1.5 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 whitespace-nowrap flex items-center gap-1"
-                              >
-                                {updatingId === antrag.id
-                                  ? <Loader2 size={12} className="animate-spin" />
-                                  : `→ ${STATUS_CONFIG[cfg.next].label}`}
-                              </button>
-                            ) : (
-                              <span className="text-xs text-gray-300">—</span>
-                            )}
-                            <a
-                              href={`/api/admin/vollmacht?id=${antrag.id}`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              onClick={(e) => {
-                                e.preventDefault();
-                                fetch(`/api/admin/vollmacht?id=${antrag.id}`, {
-                                  headers: { "x-admin-password": password },
-                                })
-                                  .then((r) => r.blob())
-                                  .then((blob) => {
-                                    const url = URL.createObjectURL(blob);
-                                    const a = document.createElement("a");
-                                    a.href = url;
-                                    a.download = `Vollmacht_${antrag.vorname}_${antrag.nachname}.pdf`;
-                                    a.click();
-                                    URL.revokeObjectURL(url);
-                                  });
-                              }}
-                              className="text-xs bg-gray-100 hover:bg-gray-200 text-gray-600 px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap flex items-center gap-1 cursor-pointer"
-                            >
-                              <FileText size={11} /> Vollmacht
-                            </a>
-                          </div>
-                        </td>
-                      </tr>
+                              {hasSepa && (
+                                <button
+                                  onClick={() => setExpandedSepa(sepaOpen ? null : antrag.id)}
+                                  className="text-xs bg-blue-50 hover:bg-blue-100 text-blue-700 px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap flex items-center gap-1"
+                                >
+                                  {sepaOpen ? <ChevronUp size={11} /> : <ChevronDown size={11} />}
+                                  SEPA
+                                </button>
+                              )}
+                            </div>
+                          </td>
+                        </tr>
+
+                        {/* ── SEPA-Detail-Panel ──────────────────────────── */}
+                        {sepaOpen && hasSepa && (
+                          <tr key={`${antrag.id}-sepa`}>
+                            <td colSpan={7} className="bg-blue-50 border-b border-blue-100 px-6 py-5">
+                              <div className="max-w-2xl">
+                                <div className="flex items-center justify-between mb-3">
+                                  <h3 className="font-bold text-[#111111] text-sm">SEPA-Lastschriftmandat</h3>
+                                  <button
+                                    onClick={() =>
+                                      downloadPdf(
+                                        `/api/admin/sepa-pdf/${antrag.id}`,
+                                        `SEPA-Mandat_${antrag.id}.pdf`
+                                      )
+                                    }
+                                    className="flex items-center gap-1.5 text-xs bg-[#2563eb] text-white px-3 py-1.5 rounded-lg hover:bg-blue-700 transition-colors"
+                                  >
+                                    <Download size={11} /> SEPA-PDF
+                                  </button>
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-x-8 gap-y-2 text-sm mb-4">
+                                  <div>
+                                    <span className="text-xs text-gray-400 uppercase tracking-wider">Kontoinhaber</span>
+                                    <p className="font-medium text-[#111111]">{antrag.sepa_kontoinhaber}</p>
+                                  </div>
+                                  <div>
+                                    <span className="text-xs text-gray-400 uppercase tracking-wider">IBAN</span>
+                                    <div className="flex items-center gap-2">
+                                      <p className="font-mono font-medium text-[#111111]">
+                                        {formatIBAN(antrag.sepa_iban!)}
+                                      </p>
+                                      <button
+                                        onClick={() => copyIBAN(antrag.sepa_iban!, antrag.id)}
+                                        title="IBAN kopieren"
+                                        className="text-gray-400 hover:text-[#2563eb] transition-colors"
+                                      >
+                                        {copiedId === antrag.id
+                                          ? <Check size={13} className="text-green-500" />
+                                          : <Copy size={13} />}
+                                      </button>
+                                    </div>
+                                  </div>
+                                  <div>
+                                    <span className="text-xs text-gray-400 uppercase tracking-wider">BIC</span>
+                                    <p className="text-[#111111]">{antrag.sepa_bic || "—"}</p>
+                                  </div>
+                                  <div>
+                                    <span className="text-xs text-gray-400 uppercase tracking-wider">Bank</span>
+                                    <p className="text-[#111111]">{antrag.sepa_kreditinstitut}</p>
+                                  </div>
+                                  <div>
+                                    <span className="text-xs text-gray-400 uppercase tracking-wider">Adresse</span>
+                                    <p className="text-[#111111]">{antrag.sepa_adresse}</p>
+                                  </div>
+                                  <div>
+                                    <span className="text-xs text-gray-400 uppercase tracking-wider">Erteilt am</span>
+                                    <p className="text-[#111111]">
+                                      {antrag.sepa_mandat_datum
+                                        ? new Date(antrag.sepa_mandat_datum).toLocaleString("de-DE", {
+                                            day: "2-digit", month: "2-digit", year: "numeric",
+                                            hour: "2-digit", minute: "2-digit",
+                                          })
+                                        : "—"}
+                                    </p>
+                                  </div>
+                                </div>
+
+                                {/* Zustimmungen */}
+                                <div className="flex flex-wrap gap-3 mb-4">
+                                  {[
+                                    [antrag.agb_akzeptiert,         "AGB akzeptiert"],
+                                    [antrag.vollmacht_erteilt,      "Vollmacht erteilt"],
+                                    [antrag.datenschutz_akzeptiert, "Datenschutz akzeptiert"],
+                                  ].map(([val, label]) => (
+                                    <span
+                                      key={String(label)}
+                                      className={`text-xs font-medium px-2.5 py-1 rounded-full ${
+                                        val ? "bg-green-100 text-green-700" : "bg-red-100 text-red-600"
+                                      }`}
+                                    >
+                                      {val ? "✅" : "❌"} {String(label)}
+                                    </span>
+                                  ))}
+                                </div>
+
+                                {/* Unterschrift */}
+                                {antrag.sepa_unterschrift_url && (
+                                  <div>
+                                    <span className="text-xs text-gray-400 uppercase tracking-wider">Unterschrift</span>
+                                    <div className="mt-1 flex gap-2">
+                                      <button
+                                        onClick={() => setSigModal(antrag.id)}
+                                        className="text-xs bg-white border border-gray-200 hover:border-gray-300 text-gray-600 px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1"
+                                      >
+                                        <Eye size={11} /> Anzeigen
+                                      </button>
+                                      <button
+                                        onClick={() =>
+                                          downloadDokument(
+                                            antrag.sepa_unterschrift_url!,
+                                            `Unterschrift_${antrag.id}.png`
+                                          )
+                                        }
+                                        className="text-xs bg-white border border-gray-200 hover:border-gray-300 text-gray-600 px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1"
+                                      >
+                                        <Download size={11} /> Download
+                                      </button>
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+                            </td>
+                          </tr>
+                        )}
+                      </>
                     );
                   })}
                 </tbody>
@@ -344,6 +498,43 @@ export default function AdminPage() {
           )}
         </div>
       </div>
+
+      {/* Unterschrift-Modal */}
+      {sigModal && (
+        <div
+          className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+          onClick={() => setSigModal(null)}
+        >
+          <div className="bg-white rounded-2xl p-6 max-w-lg w-full" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-bold text-[#111111]">Digitale Unterschrift</h3>
+              <button onClick={() => setSigModal(null)} className="text-gray-400 hover:text-gray-600 text-lg leading-none">×</button>
+            </div>
+            <SignaturePreview
+              path={antraege.find((a) => a.id === sigModal)?.sepa_unterschrift_url ?? ""}
+              password={password}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
+}
+
+/** Lädt die Unterschrift-URL via Admin-Dokument-Endpoint und zeigt sie als <img> */
+function SignaturePreview({ path, password }: { path: string; password: string }) {
+  const [url, setUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!path) return;
+    fetch(`/api/admin/dokument?pfad=${encodeURIComponent(path)}`, {
+      headers: { "x-admin-password": password },
+    })
+      .then((r) => r.json())
+      .then((d) => setUrl(d.url))
+      .catch(() => null);
+  }, [path, password]);
+
+  if (!url) return <div className="flex justify-center py-8"><Loader2 size={24} className="animate-spin text-gray-300" /></div>;
+  return <img src={url} alt="Unterschrift" className="w-full border border-gray-100 rounded-xl" />;
 }

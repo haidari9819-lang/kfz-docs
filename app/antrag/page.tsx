@@ -6,6 +6,7 @@ import {
   CheckCircle, Upload, X, ChevronRight, ChevronLeft,
   Car, FileText, UserCheck, Loader2, AlertCircle, Sparkles, Info,
 } from "lucide-react";
+import SEPAMandat, { type SepaData, isSepaValid } from "@/components/SEPAMandat";
 
 type Service = "anmeldung" | "abmeldung" | "halterwechsel";
 
@@ -25,7 +26,7 @@ function getRequiredDocs(service: Service | null): DocDef[] {
   if (service === "anmeldung") {
     base.push({ key: "evb",           label: "eVB-Nummer (Versicherungsnachweis)", optional: true });
     base.push({ key: "fahrzeugbrief", label: "Fahrzeugbrief (ZB Teil II)" });
-    base.push({ key: "sepa",          label: "SEPA-Lastschriftmandat" });
+    // SEPA wird als Formular erfasst — kein Upload mehr
   }
   if (service === "halterwechsel") {
     base.push({ key: "evb",           label: "eVB-Nummer (Versicherungsnachweis)" });
@@ -91,6 +92,7 @@ export default function AntragPage() {
     sicherheitscode_hinten: "",
   });
   const [dragOver, setDragOver] = useState<string | null>(null);
+  const [sepaData, setSepaData] = useState<SepaData | null>(null);
 
   // Upload & Scan State
   const [antragId, setAntragId] = useState<string | null>(null);
@@ -113,6 +115,9 @@ export default function AntragPage() {
       if (!docsOk) return false;
       if (service === "abmeldung") {
         return !!(contact.kennzeichen && contact.sicherheitscode_vorne && contact.sicherheitscode_hinten);
+      }
+      if (service === "anmeldung" || service === "halterwechsel") {
+        return isSepaValid(sepaData ?? ({} as SepaData));
       }
       return true;
     }
@@ -218,7 +223,7 @@ export default function AntragPage() {
         const patchRes = await fetch(`/api/antrag/${antragId}`, {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(contact),
+          body: JSON.stringify({ ...contact, sepaData }),
         });
         if (!patchRes.ok) {
           const { error } = await patchRes.json();
@@ -388,6 +393,11 @@ export default function AntragPage() {
                   </div>
                 );
               })}
+
+              {/* SEPA-Formular für Anmeldung + Halterwechsel */}
+              {(service === "anmeldung" || service === "halterwechsel") && (
+                <SEPAMandat onChange={setSepaData} />
+              )}
 
               {/* Zusatzfelder nur bei Abmeldung */}
               {service === "abmeldung" && (
@@ -587,6 +597,24 @@ export default function AntragPage() {
                 <p className="text-sm text-gray-500">{contact.email} · {contact.telefon}</p>
                 <p className="text-sm text-gray-500">{contact.adresse}, {contact.plz} {contact.ort}</p>
               </div>
+              {sepaData && isSepaValid(sepaData) && (
+                <>
+                  <hr className="border-gray-100" />
+                  <div>
+                    <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">SEPA-Mandat</h3>
+                    <p className="text-sm text-gray-700">{sepaData.vorname} {sepaData.nachname}</p>
+                    <p className="text-sm text-gray-500 font-mono">
+                      IBAN: ****{sepaData.iban.replace(/\s/g, "").slice(-4)}
+                    </p>
+                    <p className="text-sm text-gray-500">{sepaData.kreditinstitut}</p>
+                    <div className="flex gap-3 mt-1 text-xs text-green-600">
+                      {sepaData.vollmachtErteilt && <span>✓ Vollmacht</span>}
+                      {sepaData.agbAkzeptiert && <span>✓ AGB</span>}
+                      {sepaData.unterschriftBase64 && <span>✓ Unterschrift</span>}
+                    </div>
+                  </div>
+                </>
+              )}
               {service === "abmeldung" && (contact.kennzeichen || contact.sicherheitscode_vorne) && (
                 <>
                   <hr className="border-gray-100" />
