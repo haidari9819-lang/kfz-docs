@@ -23,7 +23,9 @@
       "Bash(ls C:/kfz-docs/*.svg)",
       "Bash(sed -i 's|<div className=\"text-2xl font-bold mb-1\">KFZ<span className=\"text-\\\\[#2563eb\\\\]\">-Docs</span></div>|<Image src=\"/logo.svg\" alt=\"KFZ-Docs Logo\" width={140} height={32} priority />|g' C:/kfz-docs/app/admin/page.tsx)",
       "Bash(sed -i 's|<span className=\"font-bold text-lg tracking-tight\">KFZ<span className=\"text-\\\\[#2563eb\\\\]\">-Docs</span></span>|<Image src=\"/logo.svg\" alt=\"KFZ-Docs Logo\" width={120} height={28} />|g' C:/kfz-docs/app/admin/page.tsx)",
-      "Bash(xargs sed:*)"
+      "Bash(xargs sed:*)",
+      "Bash(node:*)",
+      "Bash(ls:*)"
     ]
   }
 }

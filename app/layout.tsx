@@ -77,10 +77,6 @@ export default function RootLayout({
           <div className="max-w-6xl mx-auto px-6 flex flex-wrap gap-6 items-center justify-between">
             <div className="flex flex-col gap-1">
               <span className="text-xs text-gray-400">© {new Date().getFullYear()} KFZ-Docs — Powered by QR-Docs</span>
-              <div className="flex gap-4 text-xs text-gray-400">
-                <a href="mailto:haidari9819@gmail.com" className="hover:text-gray-600 transition-colors">haidari9819@gmail.com</a>
-                <a href="tel:+4917680822282" className="hover:text-gray-600 transition-colors">0176 80822282</a>
-              </div>
               <div className="flex gap-2 mt-1">
                 <a
                   href="https://facebook.com/kfzdocs"
