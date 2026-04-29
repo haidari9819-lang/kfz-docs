@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
+import BewertungSection from "@/components/BewertungSection";
 import { CheckCircle, ChevronRight, Clock, Shield, Zap, Star, Lock, CreditCard, MapPin } from "lucide-react";
 
 const STAEDTE = [
@@ -226,21 +227,7 @@ export default async function StadtPage(
           komplett online, ohne Warteschlange bei der Zulassungsstelle.
         </p>
 
-        {/* Social Proof */}
-        <div className="flex flex-wrap gap-3 mb-6">
-          <div className="flex items-center gap-2 bg-green-50 border border-green-200 rounded-xl px-4 py-2.5">
-            <CheckCircle size={15} className="text-green-500 shrink-0" />
-            <span className="text-sm font-medium text-green-800">
-              Bereits {stadt.antraege.toLocaleString("de-DE")} Anträge in {stadt.name} bearbeitet
-            </span>
-          </div>
-          <div className="flex items-center gap-1.5 bg-yellow-50 border border-yellow-200 rounded-xl px-4 py-2.5">
-            {[...Array(5)].map((_, i) => (
-              <Star key={i} size={12} className="text-yellow-400 fill-yellow-400" />
-            ))}
-            <span className="text-sm font-medium text-yellow-800 ml-1">4,9 / 5 Sterne</span>
-          </div>
-        </div>
+        
 
         {/* Trust Badges */}
         <div className="flex flex-wrap gap-2 mb-10">
@@ -359,7 +346,8 @@ export default async function StadtPage(
           </Link>
         </div>
 
-        {/* FAQ */}
+        <BewertungSection stadtSlug={stadt.slug} stadtName={stadt.name} />
+      {/* FAQ */}
         <div className="mb-14">
           <h2 className="text-2xl font-bold text-[#111111] mb-6">
             Häufige Fragen — KFZ Zulassung {stadt.name}
@@ -403,3 +391,4 @@ export default async function StadtPage(
     </div>
   );
 }
+
