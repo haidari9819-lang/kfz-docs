@@ -7,60 +7,60 @@ import { CheckCircle, ChevronRight, Clock, Shield, Zap, Star, Lock, CreditCard, 
 
 const STAEDTE = [
   // ── NRW ──────────────────────────────────────────────────────────────────
-  { slug: "essen",            name: "Essen",            bundesland: "NRW",                  kfz: "E",   antraege: 1247, nachbarn: ["bochum","duisburg","bottrop","oberhausen","gelsenkirchen"] },
-  { slug: "dortmund",         name: "Dortmund",          bundesland: "NRW",                  kfz: "DO",  antraege: 1389, nachbarn: ["bochum","hagen","hamm","recklinghausen","gelsenkirchen"] },
-  { slug: "koeln",            name: "Köln",              bundesland: "NRW",                  kfz: "K",   antraege: 2156, nachbarn: ["bonn","leverkusen","bergisch-gladbach","aachen","solingen"] },
-  { slug: "duesseldorf",      name: "Düsseldorf",        bundesland: "NRW",                  kfz: "D",   antraege: 1874, nachbarn: ["koeln","krefeld","wuppertal","muelheim","duisburg"] },
-  { slug: "bochum",           name: "Bochum",            bundesland: "NRW",                  kfz: "BO",  antraege: 987,  nachbarn: ["essen","dortmund","recklinghausen","bottrop","hagen"] },
-  { slug: "wuppertal",        name: "Wuppertal",         bundesland: "NRW",                  kfz: "W",   antraege: 743,  nachbarn: ["remscheid","solingen","hagen","leverkusen","duesseldorf"] },
-  { slug: "bielefeld",        name: "Bielefeld",         bundesland: "NRW",                  kfz: "BI",  antraege: 856,  nachbarn: ["muenster","paderborn","osnabrueck","hamm","hannover"] },
-  { slug: "bonn",             name: "Bonn",              bundesland: "NRW",                  kfz: "BN",  antraege: 1123, nachbarn: ["koeln","leverkusen","bergisch-gladbach","aachen","siegen"] },
-  { slug: "muenster",         name: "Münster",           bundesland: "NRW",                  kfz: "MS",  antraege: 934,  nachbarn: ["bielefeld","osnabrueck","paderborn","recklinghausen","hamm"] },
-  { slug: "gelsenkirchen",    name: "Gelsenkirchen",     bundesland: "NRW",                  kfz: "GE",  antraege: 612,  nachbarn: ["essen","bochum","dortmund","recklinghausen","bottrop"] },
-  { slug: "aachen",           name: "Aachen",            bundesland: "NRW",                  kfz: "AC",  antraege: 789,  nachbarn: ["koeln","bonn","duesseldorf","krefeld","leverkusen"] },
-  { slug: "duisburg",         name: "Duisburg",          bundesland: "NRW",                  kfz: "DU",  antraege: 834,  nachbarn: ["essen","oberhausen","muelheim","duesseldorf","krefeld"] },
-  { slug: "oberhausen",       name: "Oberhausen",        bundesland: "NRW",                  kfz: "OB",  antraege: 456,  nachbarn: ["essen","duisburg","bottrop","muelheim","gelsenkirchen"] },
-  { slug: "krefeld",          name: "Krefeld",           bundesland: "NRW",                  kfz: "KR",  antraege: 523,  nachbarn: ["duesseldorf","duisburg","koeln","bonn","aachen"] },
-  { slug: "hagen",            name: "Hagen",             bundesland: "NRW",                  kfz: "HA",  antraege: 489,  nachbarn: ["dortmund","bochum","siegen","remscheid","wuppertal"] },
-  { slug: "hamm",             name: "Hamm",              bundesland: "NRW",                  kfz: "HAM", antraege: 378,  nachbarn: ["dortmund","muenster","bielefeld","paderborn","recklinghausen"] },
-  { slug: "muelheim",         name: "Mülheim",           bundesland: "NRW",                  kfz: "MH",  antraege: 412,  nachbarn: ["essen","duisburg","oberhausen","duesseldorf","bochum"] },
-  { slug: "solingen",         name: "Solingen",          bundesland: "NRW",                  kfz: "SG",  antraege: 367,  nachbarn: ["remscheid","wuppertal","leverkusen","bergisch-gladbach","hagen"] },
-  { slug: "leverkusen",       name: "Leverkusen",        bundesland: "NRW",                  kfz: "LEV", antraege: 445,  nachbarn: ["koeln","bonn","bergisch-gladbach","solingen","wuppertal"] },
-  { slug: "siegen",           name: "Siegen",            bundesland: "NRW",                  kfz: "SI",  antraege: 312,  nachbarn: ["hagen","wuppertal","bonn","koeln","dortmund"] },
-  { slug: "paderborn",        name: "Paderborn",         bundesland: "NRW",                  kfz: "PB",  antraege: 289,  nachbarn: ["bielefeld","hamm","muenster","dortmund","hannover"] },
-  { slug: "recklinghausen",   name: "Recklinghausen",    bundesland: "NRW",                  kfz: "RE",  antraege: 334,  nachbarn: ["gelsenkirchen","bochum","dortmund","muenster","hamm"] },
-  { slug: "bottrop",          name: "Bottrop",           bundesland: "NRW",                  kfz: "BOT", antraege: 298,  nachbarn: ["essen","oberhausen","gelsenkirchen","duisburg","bochum"] },
-  { slug: "remscheid",        name: "Remscheid",         bundesland: "NRW",                  kfz: "RS",  antraege: 276,  nachbarn: ["wuppertal","solingen","hagen","duesseldorf","leverkusen"] },
-  { slug: "bergisch-gladbach",name: "Bergisch Gladbach", bundesland: "NRW",                  kfz: "GL",  antraege: 267,  nachbarn: ["koeln","leverkusen","bonn","solingen","wuppertal"] },
+  { slug: "essen",             name: "Essen",             bundesland: "NRW",               kfz: "E",   wartezeit: "4–6 Wochen", stadtteile: "Rüttenscheid, Steele, Kettwig",         nachbarn: ["bochum","duisburg","bottrop","oberhausen","gelsenkirchen"] },
+  { slug: "dortmund",          name: "Dortmund",           bundesland: "NRW",               kfz: "DO",  wartezeit: "5–7 Wochen", stadtteile: "Hörde, Aplerbeck, Hombruch",            nachbarn: ["bochum","hagen","hamm","recklinghausen","gelsenkirchen"] },
+  { slug: "koeln",             name: "Köln",               bundesland: "NRW",               kfz: "K",   wartezeit: "6–10 Wochen",stadtteile: "Ehrenfeld, Nippes, Deutz, Porz",        nachbarn: ["bonn","leverkusen","bergisch-gladbach","aachen","solingen"] },
+  { slug: "duesseldorf",       name: "Düsseldorf",         bundesland: "NRW",               kfz: "D",   wartezeit: "6–8 Wochen", stadtteile: "Bilk, Gerresheim, Benrath, Pempelfort", nachbarn: ["koeln","krefeld","wuppertal","muelheim","duisburg"] },
+  { slug: "bochum",            name: "Bochum",             bundesland: "NRW",               kfz: "BO",  wartezeit: "3–5 Wochen", stadtteile: "Langendreer, Wattenscheid, Wiemelhausen",nachbarn: ["essen","dortmund","recklinghausen","bottrop","hagen"] },
+  { slug: "wuppertal",         name: "Wuppertal",          bundesland: "NRW",               kfz: "W",   wartezeit: "3–5 Wochen", stadtteile: "Elberfeld, Barmen, Vohwinkel",          nachbarn: ["remscheid","solingen","hagen","leverkusen","duesseldorf"] },
+  { slug: "bielefeld",         name: "Bielefeld",          bundesland: "NRW",               kfz: "BI",  wartezeit: "3–4 Wochen", stadtteile: "Brackwede, Sennestadt, Jöllenbeck",     nachbarn: ["muenster","paderborn","osnabrueck","hamm","hannover"] },
+  { slug: "bonn",              name: "Bonn",               bundesland: "NRW",               kfz: "BN",  wartezeit: "4–6 Wochen", stadtteile: "Bad Godesberg, Beuel, Hardtberg",       nachbarn: ["koeln","leverkusen","bergisch-gladbach","aachen","siegen"] },
+  { slug: "muenster",          name: "Münster",            bundesland: "NRW",               kfz: "MS",  wartezeit: "3–5 Wochen", stadtteile: "Hiltrup, Gievenbeck, Amelsbüren",       nachbarn: ["bielefeld","osnabrueck","paderborn","recklinghausen","hamm"] },
+  { slug: "gelsenkirchen",     name: "Gelsenkirchen",      bundesland: "NRW",               kfz: "GE",  wartezeit: "2–4 Wochen", stadtteile: "Buer, Horst, Erle",                    nachbarn: ["essen","bochum","dortmund","recklinghausen","bottrop"] },
+  { slug: "aachen",            name: "Aachen",             bundesland: "NRW",               kfz: "AC",  wartezeit: "3–5 Wochen", stadtteile: "Laurensberg, Burtscheid, Eilendorf",    nachbarn: ["koeln","bonn","duesseldorf","krefeld","leverkusen"] },
+  { slug: "duisburg",          name: "Duisburg",           bundesland: "NRW",               kfz: "DU",  wartezeit: "4–6 Wochen", stadtteile: "Rheinhausen, Homberg, Marxloh",         nachbarn: ["essen","oberhausen","muelheim","duesseldorf","krefeld"] },
+  { slug: "oberhausen",        name: "Oberhausen",         bundesland: "NRW",               kfz: "OB",  wartezeit: "3–4 Wochen", stadtteile: "Sterkrade, Osterfeld, Alstaden",        nachbarn: ["essen","duisburg","bottrop","muelheim","gelsenkirchen"] },
+  { slug: "krefeld",           name: "Krefeld",            bundesland: "NRW",               kfz: "KR",  wartezeit: "3–5 Wochen", stadtteile: "Uerdingen, Hüls, Fischeln",             nachbarn: ["duesseldorf","duisburg","koeln","bonn","aachen"] },
+  { slug: "hagen",             name: "Hagen",              bundesland: "NRW",               kfz: "HA",  wartezeit: "2–4 Wochen", stadtteile: "Haspe, Hohenlimburg, Vorhalle",         nachbarn: ["dortmund","bochum","siegen","remscheid","wuppertal"] },
+  { slug: "hamm",              name: "Hamm",               bundesland: "NRW",               kfz: "HAM", wartezeit: "2–3 Wochen", stadtteile: "Heessen, Bockum-Hövel, Pelkum",         nachbarn: ["dortmund","muenster","bielefeld","paderborn","recklinghausen"] },
+  { slug: "muelheim",          name: "Mülheim",            bundesland: "NRW",               kfz: "MH",  wartezeit: "3–4 Wochen", stadtteile: "Saarn, Speldorf, Heißen",               nachbarn: ["essen","duisburg","oberhausen","duesseldorf","bochum"] },
+  { slug: "solingen",          name: "Solingen",           bundesland: "NRW",               kfz: "SG",  wartezeit: "2–4 Wochen", stadtteile: "Ohligs, Wald, Gräfrath",                nachbarn: ["remscheid","wuppertal","leverkusen","bergisch-gladbach","hagen"] },
+  { slug: "leverkusen",        name: "Leverkusen",         bundesland: "NRW",               kfz: "LEV", wartezeit: "3–5 Wochen", stadtteile: "Opladen, Schlebusch, Manfort",          nachbarn: ["koeln","bonn","bergisch-gladbach","solingen","wuppertal"] },
+  { slug: "siegen",            name: "Siegen",             bundesland: "NRW",               kfz: "SI",  wartezeit: "2–3 Wochen", stadtteile: "Weidenau, Geisweid, Eiserfeld",         nachbarn: ["hagen","wuppertal","bonn","koeln","dortmund"] },
+  { slug: "paderborn",         name: "Paderborn",          bundesland: "NRW",               kfz: "PB",  wartezeit: "2–3 Wochen", stadtteile: "Schloß Neuhaus, Elsen, Sande",          nachbarn: ["bielefeld","hamm","muenster","dortmund","hannover"] },
+  { slug: "recklinghausen",    name: "Recklinghausen",     bundesland: "NRW",               kfz: "RE",  wartezeit: "2–4 Wochen", stadtteile: "Suderwich, Hochlarmark, Hillen",         nachbarn: ["gelsenkirchen","bochum","dortmund","muenster","hamm"] },
+  { slug: "bottrop",           name: "Bottrop",            bundesland: "NRW",               kfz: "BOT", wartezeit: "2–3 Wochen", stadtteile: "Kirchhellen, Boy, Batenbrock",          nachbarn: ["essen","oberhausen","gelsenkirchen","duisburg","bochum"] },
+  { slug: "remscheid",         name: "Remscheid",          bundesland: "NRW",               kfz: "RS",  wartezeit: "2–3 Wochen", stadtteile: "Lennep, Lüttringhausen, Hasten",        nachbarn: ["wuppertal","solingen","hagen","duesseldorf","leverkusen"] },
+  { slug: "bergisch-gladbach", name: "Bergisch Gladbach",  bundesland: "NRW",               kfz: "GL",  wartezeit: "2–3 Wochen", stadtteile: "Refrath, Bensberg, Moitzfeld",          nachbarn: ["koeln","leverkusen","bonn","solingen","wuppertal"] },
   // ── Übrige Deutschland ───────────────────────────────────────────────────
-  { slug: "berlin",           name: "Berlin",            bundesland: "Berlin",               kfz: "B",   antraege: 3241, nachbarn: ["potsdam","magdeburg","hannover","halle","leipzig"] },
-  { slug: "hamburg",          name: "Hamburg",           bundesland: "Hamburg",              kfz: "HH",  antraege: 2987, nachbarn: ["kiel","rostock","hannover","bremen","osnabrueck"] },
-  { slug: "muenchen",         name: "München",           bundesland: "Bayern",               kfz: "M",   antraege: 2754, nachbarn: ["augsburg","nuernberg","stuttgart","karlsruhe","mannheim"] },
-  { slug: "frankfurt",        name: "Frankfurt",         bundesland: "Hessen",               kfz: "F",   antraege: 1876, nachbarn: ["mainz","wiesbaden","kassel","mannheim","heidelberg"] },
-  { slug: "stuttgart",        name: "Stuttgart",         bundesland: "Baden-Württemberg",    kfz: "S",   antraege: 1432, nachbarn: ["karlsruhe","mannheim","freiburg","augsburg","nuernberg"] },
-  { slug: "leipzig",          name: "Leipzig",           bundesland: "Sachsen",              kfz: "L",   antraege: 876,  nachbarn: ["halle","erfurt","chemnitz","dresden","magdeburg"] },
-  { slug: "bremen",           name: "Bremen",            bundesland: "Bremen",               kfz: "HB",  antraege: 743,  nachbarn: ["hamburg","hannover","osnabrueck","kiel","braunschweig"] },
-  { slug: "hannover",         name: "Hannover",          bundesland: "Niedersachsen",        kfz: "H",   antraege: 1098, nachbarn: ["bielefeld","osnabrueck","kassel","braunschweig","bremen"] },
-  { slug: "nuernberg",        name: "Nürnberg",          bundesland: "Bayern",               kfz: "N",   antraege: 1034, nachbarn: ["muenchen","augsburg","stuttgart","chemnitz","erfurt"] },
-  { slug: "dresden",          name: "Dresden",           bundesland: "Sachsen",              kfz: "DD",  antraege: 823,  nachbarn: ["chemnitz","leipzig","halle","magdeburg","erfurt"] },
-  { slug: "mannheim",         name: "Mannheim",          bundesland: "Baden-Württemberg",    kfz: "MA",  antraege: 654,  nachbarn: ["heidelberg","karlsruhe","frankfurt","mainz","wiesbaden"] },
-  { slug: "karlsruhe",        name: "Karlsruhe",         bundesland: "Baden-Württemberg",    kfz: "KA",  antraege: 712,  nachbarn: ["freiburg","heidelberg","mannheim","stuttgart","saarbruecken"] },
-  { slug: "augsburg",         name: "Augsburg",          bundesland: "Bayern",               kfz: "A",   antraege: 589,  nachbarn: ["muenchen","nuernberg","stuttgart","karlsruhe","freiburg"] },
-  { slug: "wiesbaden",        name: "Wiesbaden",         bundesland: "Hessen",               kfz: "WI",  antraege: 634,  nachbarn: ["mainz","frankfurt","mannheim","heidelberg","karlsruhe"] },
-  { slug: "mainz",            name: "Mainz",             bundesland: "Rheinland-Pfalz",      kfz: "MZ",  antraege: 567,  nachbarn: ["wiesbaden","frankfurt","mannheim","heidelberg","saarbruecken"] },
-  { slug: "freiburg",         name: "Freiburg",          bundesland: "Baden-Württemberg",    kfz: "FR",  antraege: 489,  nachbarn: ["karlsruhe","mannheim","heidelberg","stuttgart","augsburg"] },
-  { slug: "erfurt",           name: "Erfurt",            bundesland: "Thüringen",            kfz: "EF",  antraege: 423,  nachbarn: ["halle","leipzig","chemnitz","magdeburg","kassel"] },
-  { slug: "rostock",          name: "Rostock",           bundesland: "Mecklenburg-Vorp.",    kfz: "HRO", antraege: 387,  nachbarn: ["kiel","hamburg","berlin","magdeburg","braunschweig"] },
-  { slug: "kassel",           name: "Kassel",            bundesland: "Hessen",               kfz: "KS",  antraege: 356,  nachbarn: ["bielefeld","hannover","frankfurt","paderborn","erfurt"] },
-  { slug: "saarbruecken",     name: "Saarbrücken",       bundesland: "Saarland",             kfz: "SB",  antraege: 412,  nachbarn: ["mannheim","heidelberg","karlsruhe","frankfurt","mainz"] },
-  { slug: "potsdam",          name: "Potsdam",           bundesland: "Brandenburg",          kfz: "P",   antraege: 534,  nachbarn: ["berlin","magdeburg","hannover","halle","leipzig"] },
-  { slug: "osnabrueck",       name: "Osnabrück",         bundesland: "Niedersachsen",        kfz: "OS",  antraege: 445,  nachbarn: ["hannover","bielefeld","muenster","bremen","hamburg"] },
-  { slug: "heidelberg",       name: "Heidelberg",        bundesland: "Baden-Württemberg",    kfz: "HD",  antraege: 478,  nachbarn: ["mannheim","karlsruhe","frankfurt","mainz","wiesbaden"] },
-  { slug: "braunschweig",     name: "Braunschweig",      bundesland: "Niedersachsen",        kfz: "BS",  antraege: 543,  nachbarn: ["hannover","magdeburg","berlin","potsdam","rostock"] },
-  { slug: "kiel",             name: "Kiel",              bundesland: "Schleswig-Holstein",   kfz: "KI",  antraege: 489,  nachbarn: ["rostock","hamburg","bremen","hannover","osnabrueck"] },
-  { slug: "chemnitz",         name: "Chemnitz",          bundesland: "Sachsen",              kfz: "C",   antraege: 432,  nachbarn: ["dresden","leipzig","erfurt","halle","magdeburg"] },
-  { slug: "halle",            name: "Halle",             bundesland: "Sachsen-Anhalt",       kfz: "HAL", antraege: 398,  nachbarn: ["leipzig","erfurt","magdeburg","chemnitz","dresden"] },
-  { slug: "magdeburg",        name: "Magdeburg",         bundesland: "Sachsen-Anhalt",       kfz: "MD",  antraege: 412,  nachbarn: ["potsdam","berlin","halle","hannover","braunschweig"] },
+  { slug: "berlin",            name: "Berlin",             bundesland: "Berlin",            kfz: "B",   wartezeit: "8–12 Wochen",stadtteile: "Mitte, Prenzlauer Berg, Kreuzberg",     nachbarn: ["potsdam","magdeburg","hannover","halle","leipzig"] },
+  { slug: "hamburg",           name: "Hamburg",            bundesland: "Hamburg",           kfz: "HH",  wartezeit: "6–8 Wochen", stadtteile: "Altona, Eimsbüttel, Wandsbek",          nachbarn: ["kiel","rostock","hannover","bremen","osnabrueck"] },
+  { slug: "muenchen",          name: "München",            bundesland: "Bayern",            kfz: "M",   wartezeit: "8–10 Wochen",stadtteile: "Schwabing, Maxvorstadt, Pasing",        nachbarn: ["augsburg","nuernberg","stuttgart","karlsruhe","mannheim"] },
+  { slug: "frankfurt",         name: "Frankfurt",          bundesland: "Hessen",            kfz: "F",   wartezeit: "5–7 Wochen", stadtteile: "Sachsenhausen, Bornheim, Höchst",       nachbarn: ["mainz","wiesbaden","kassel","mannheim","heidelberg"] },
+  { slug: "stuttgart",         name: "Stuttgart",          bundesland: "Baden-Württemberg", kfz: "S",   wartezeit: "4–6 Wochen", stadtteile: "Bad Cannstatt, Vaihingen, Zuffenhausen", nachbarn: ["karlsruhe","mannheim","freiburg","augsburg","nuernberg"] },
+  { slug: "leipzig",           name: "Leipzig",            bundesland: "Sachsen",           kfz: "L",   wartezeit: "3–5 Wochen", stadtteile: "Gohlis, Connewitz, Lindenau",           nachbarn: ["halle","erfurt","chemnitz","dresden","magdeburg"] },
+  { slug: "bremen",            name: "Bremen",             bundesland: "Bremen",            kfz: "HB",  wartezeit: "3–5 Wochen", stadtteile: "Schwachhausen, Findorff, Hemelingen",   nachbarn: ["hamburg","hannover","osnabrueck","kiel","braunschweig"] },
+  { slug: "hannover",          name: "Hannover",           bundesland: "Niedersachsen",     kfz: "H",   wartezeit: "4–6 Wochen", stadtteile: "Linden, Bothfeld, Döhren",              nachbarn: ["bielefeld","osnabrueck","kassel","braunschweig","bremen"] },
+  { slug: "nuernberg",         name: "Nürnberg",           bundesland: "Bayern",            kfz: "N",   wartezeit: "4–6 Wochen", stadtteile: "Gostenhof, Langwasser, Ziegelstein",    nachbarn: ["muenchen","augsburg","stuttgart","chemnitz","erfurt"] },
+  { slug: "dresden",           name: "Dresden",            bundesland: "Sachsen",           kfz: "DD",  wartezeit: "3–5 Wochen", stadtteile: "Neustadt, Blasewitz, Leuben",           nachbarn: ["chemnitz","leipzig","halle","magdeburg","erfurt"] },
+  { slug: "mannheim",          name: "Mannheim",           bundesland: "Baden-Württemberg", kfz: "MA",  wartezeit: "3–4 Wochen", stadtteile: "Neckarstadt, Käfertal, Rheinau",         nachbarn: ["heidelberg","karlsruhe","frankfurt","mainz","wiesbaden"] },
+  { slug: "karlsruhe",         name: "Karlsruhe",          bundesland: "Baden-Württemberg", kfz: "KA",  wartezeit: "3–4 Wochen", stadtteile: "Durlach, Mühlburg, Neureut",            nachbarn: ["freiburg","heidelberg","mannheim","stuttgart","saarbruecken"] },
+  { slug: "augsburg",          name: "Augsburg",           bundesland: "Bayern",            kfz: "A",   wartezeit: "3–5 Wochen", stadtteile: "Lechhausen, Oberhausen, Haunstetten",   nachbarn: ["muenchen","nuernberg","stuttgart","karlsruhe","freiburg"] },
+  { slug: "wiesbaden",         name: "Wiesbaden",          bundesland: "Hessen",            kfz: "WI",  wartezeit: "3–5 Wochen", stadtteile: "Biebrich, Erbenheim, Sonnenberg",       nachbarn: ["mainz","frankfurt","mannheim","heidelberg","karlsruhe"] },
+  { slug: "mainz",             name: "Mainz",              bundesland: "Rheinland-Pfalz",   kfz: "MZ",  wartezeit: "3–4 Wochen", stadtteile: "Hechtsheim, Bretzenheim, Gonsenheim",   nachbarn: ["wiesbaden","frankfurt","mannheim","heidelberg","saarbruecken"] },
+  { slug: "freiburg",          name: "Freiburg",           bundesland: "Baden-Württemberg", kfz: "FR",  wartezeit: "3–4 Wochen", stadtteile: "Wiehre, Haslach, Zähringen",            nachbarn: ["karlsruhe","mannheim","heidelberg","stuttgart","augsburg"] },
+  { slug: "erfurt",            name: "Erfurt",             bundesland: "Thüringen",         kfz: "EF",  wartezeit: "2–4 Wochen", stadtteile: "Krämpfervorstadt, Ilversgehofen, Daberstedt", nachbarn: ["halle","leipzig","chemnitz","magdeburg","kassel"] },
+  { slug: "rostock",           name: "Rostock",            bundesland: "Mecklenburg-Vorp.", kfz: "HRO", wartezeit: "2–3 Wochen", stadtteile: "Evershagen, Lütten Klein, Südstadt",    nachbarn: ["kiel","hamburg","berlin","magdeburg","braunschweig"] },
+  { slug: "kassel",            name: "Kassel",             bundesland: "Hessen",            kfz: "KS",  wartezeit: "2–3 Wochen", stadtteile: "Bettenhausen, Wehlheiden, Rothenditmold",nachbarn: ["bielefeld","hannover","frankfurt","paderborn","erfurt"] },
+  { slug: "saarbruecken",      name: "Saarbrücken",        bundesland: "Saarland",          kfz: "SB",  wartezeit: "2–4 Wochen", stadtteile: "Malstatt, Dudweiler, Burbach",          nachbarn: ["mannheim","heidelberg","karlsruhe","frankfurt","mainz"] },
+  { slug: "potsdam",           name: "Potsdam",            bundesland: "Brandenburg",       kfz: "P",   wartezeit: "3–5 Wochen", stadtteile: "Babelsberg, Drewitz, Golm",             nachbarn: ["berlin","magdeburg","hannover","halle","leipzig"] },
+  { slug: "osnabrueck",        name: "Osnabrück",          bundesland: "Niedersachsen",     kfz: "OS",  wartezeit: "2–3 Wochen", stadtteile: "Schinkel, Voxtrup, Haste",              nachbarn: ["hannover","bielefeld","muenster","bremen","hamburg"] },
+  { slug: "heidelberg",        name: "Heidelberg",         bundesland: "Baden-Württemberg", kfz: "HD",  wartezeit: "2–4 Wochen", stadtteile: "Rohrbach, Kirchheim, Wieblingen",       nachbarn: ["mannheim","karlsruhe","frankfurt","mainz","wiesbaden"] },
+  { slug: "braunschweig",      name: "Braunschweig",       bundesland: "Niedersachsen",     kfz: "BS",  wartezeit: "3–4 Wochen", stadtteile: "Weststadt, Lehndorf, Rüningen",         nachbarn: ["hannover","magdeburg","berlin","potsdam","rostock"] },
+  { slug: "kiel",              name: "Kiel",               bundesland: "Schleswig-Holstein",kfz: "KI",  wartezeit: "2–3 Wochen", stadtteile: "Gaarden, Elmschenhagen, Mettenhof",     nachbarn: ["rostock","hamburg","bremen","hannover","osnabrueck"] },
+  { slug: "chemnitz",          name: "Chemnitz",           bundesland: "Sachsen",           kfz: "C",   wartezeit: "2–3 Wochen", stadtteile: "Gablenz, Bernsdorf, Helbersdorf",       nachbarn: ["dresden","leipzig","erfurt","halle","magdeburg"] },
+  { slug: "halle",             name: "Halle",              bundesland: "Sachsen-Anhalt",    kfz: "HAL", wartezeit: "2–3 Wochen", stadtteile: "Neustadt, Heide-Süd, Ammendorf",        nachbarn: ["leipzig","erfurt","magdeburg","chemnitz","dresden"] },
+  { slug: "magdeburg",         name: "Magdeburg",          bundesland: "Sachsen-Anhalt",    kfz: "MD",  wartezeit: "2–4 Wochen", stadtteile: "Sudenburg, Buckau, Stadtfeld",          nachbarn: ["potsdam","berlin","halle","hannover","braunschweig"] },
 ];
 
 export async function generateStaticParams() {
@@ -296,15 +296,17 @@ export default async function StadtPage(
         <div className="mb-14">
           <h2 className="text-2xl font-bold text-[#111111] mb-4">KFZ Zulassung {stadt.name} — so einfach geht&apos;s</h2>
           <p className="text-gray-600 leading-relaxed mb-4">
-            Die Zulassungsstelle {stadt.name} ist oft ausgelastet — lange Wartezeiten und volle
-            Terminkalender sind keine Seltenheit. Mit KFZ-Docs umgehen Sie dieses Problem vollständig:
+            Die Zulassungsstelle {stadt.name} ist aktuell stark ausgelastet —
+            Wartezeiten von {stadt.wartezeit} sind keine Seltenheit.
+            Mit KFZ-Docs umgehen Sie dieses Problem vollständig:
             Laden Sie Ihre Dokumente bequem von zu Hause hoch, und wir kümmern uns um den Rest.
-            Ihr Fahrzeug wird innerhalb von 24 Stunden zugelassen.
+            Ihr Fahrzeug wird innerhalb von 24 Stunden zugelassen — ohne Wartezeit.
           </p>
           <p className="text-gray-600 leading-relaxed mb-4">
-            Egal in welchem Stadtteil von {stadt.name} Sie wohnhaft sind —
+            Egal ob Sie in {stadt.stadtteile} oder einem anderen Stadtteil von {stadt.name} wohnhaft sind —
             unser Service steht allen Bürgern offen.
-            Das {stadt.kfz}-Kennzeichen wird direkt bei der zuständigen Zulassungsstelle {stadt.name} für Sie beantragt.
+            Das {stadt.kfz}-Kennzeichen wird direkt bei der zuständigen Zulassungsstelle {stadt.name} für Sie beantragt,
+            ohne dass Sie persönlich erscheinen müssen.
           </p>
           <p className="text-gray-600 leading-relaxed">
             Unser KI-gestütztes System prüft Ihre Dokumente automatisch auf Vollständigkeit.
@@ -391,4 +393,5 @@ export default async function StadtPage(
     </div>
   );
 }
+
 
