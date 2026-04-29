@@ -5,11 +5,11 @@ import "./globals.css";
 export const metadata: Metadata = {
   metadataBase: new URL("https://kfz.qr-docs.de"),
   title: {
-    default: "KFZ Zulassung online NRW ✓ Ohne Termin | Sofort | KFZ-Docs",
+    default: "KFZ Zulassung online NRW ✓ Ohne Termin — ab 39€ | KFZ-Docs",
     template: "%s | KFZ-Docs — Online Zulassung NRW",
   },
   description:
-    "✓ KFZ Zulassung online in NRW — Anmeldung ab 49€, Abmeldung ab 39€. Ohne Termin, ohne Warteschlange. KI-gestützt, DSGVO-konform. Essen, Dortmund, Köln, Düsseldorf. 24h Service.",
+    "KFZ Zulassung online in NRW — Anmeldung ab 49€, Abmeldung ab 39€. Ohne Termin, ohne Warteschlange. DSGVO-konform. Essen, Dortmund, Köln, Düsseldorf. 24h Service.",
   keywords: [
     "kfz zulassung online",
     "auto anmelden online nrw",
@@ -113,3 +113,4 @@ export default function RootLayout({
     </html>
   );
 }
+
