@@ -75,7 +75,7 @@ export async function generateMetadata(
   if (!stadt) return {};
   return {
     title: `KFZ Zulassung ${stadt.name} online — ohne Termin | KFZ-Docs`,
-    description: `Fahrzeug in ${stadt.name} anmelden, abmelden oder Halterwechsel — ab 39€, fertig in 24h, kein Termin nötig. ${stadt.kfz}-Kennzeichen direkt beantragen.`,
+    description: `KFZ Zulassung ${stadt.name} online — i-Kfz, Anmeldung & Abmeldung ab 39€. Ohne Termin, fertig in 24h. ${stadt.kfz}-Kennzeichen direkt beantragen.`,
     keywords: [
       `KFZ Zulassung ${stadt.name}`,
       `${stadt.name} Auto anmelden`,
@@ -84,6 +84,10 @@ export async function generateMetadata(
       `KFZ Anmeldung ${stadt.name}`,
       `Auto abmelden ${stadt.name}`,
       `Halterwechsel ${stadt.name}`,
+      `i-kfz ${stadt.name}`,
+      `i-kfz online ${stadt.name}`,
+      `KFZ online zulassen ${stadt.name}`,
+      `auto ummelden ${stadt.name} ohne termin`,
     ],
     alternates: { canonical: `https://kfz.qr-docs.de/${stadt.slug}` },
   };
@@ -393,5 +397,6 @@ export default async function StadtPage(
     </div>
   );
 }
+
 
 
